@@ -2,6 +2,7 @@ package Datenanalyse.Uebung1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.http.Header;
 
@@ -21,7 +22,7 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return href.startsWith("http://mysql12.f4.htw-berlin.de/d0");
+		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/d0") && href.endsWith(".html");
 	}
 
 	/**
@@ -51,15 +52,17 @@ public class MyCrawler extends WebCrawler {
 		System.out.println("Parent page: " + parentUrl);
 		System.out.println("Anchor text: " + anchor);
 		List<WebURL> links = new ArrayList<WebURL>();
+
 		if (page.getParseData() instanceof HtmlParseData) {
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 			String text = htmlParseData.getText();
 			String html = htmlParseData.getHtml();
-			links = htmlParseData.getOutgoingUrls();
+			links = pickHTML(htmlParseData.getOutgoingUrls());
 			System.out.println("Text length: " + text.length());
 			System.out.println("Html length: " + html.length());
 			System.out.println("Number of outgoing links: " + links.size());
 		}
+
 		Header[] responseHeaders = page.getFetchResponseHeaders();
 		if (responseHeaders != null) {
 			System.out.println("Response headers:");
@@ -69,5 +72,17 @@ public class MyCrawler extends WebCrawler {
 			}
 		}
 		System.out.println("=============");
+	}
+
+	public List<WebURL> pickHTML(List<WebURL> links) {
+		List<WebURL> result = new ArrayList<WebURL>();
+		boolean endOnHTMLTag = false;
+		for (WebURL url : links) {
+			endOnHTMLTag = url.getURL().endsWith(".html");
+			if (endOnHTMLTag) {
+				result.add(url);
+			}
+		}
+		return result;
 	}
 }
