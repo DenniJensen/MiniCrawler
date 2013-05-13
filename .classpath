@@ -22,5 +22,15 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/home/dennis/.m2/repository/edu/uci/ics/crawler4j/3.5/crawler4j-3.5.jar" sourcepath="/home/dennis/.m2/repository/edu/uci/ics/crawler4j/3.5/crawler4j-3.5-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="javadoc_location" value="jar:file:/home/dennis/.m2/repository/edu/uci/ics/crawler4j/3.5/crawler4j-3.5-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="edu.uci.ics"/>
+			<attribute name="maven.artifactId" value="crawler4j"/>
+			<attribute name="maven.version" value="3.5"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
