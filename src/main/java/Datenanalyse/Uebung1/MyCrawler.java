@@ -2,8 +2,6 @@ package Datenanalyse.Uebung1;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-
 import org.apache.http.Header;
 
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -22,7 +20,7 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/d0") && href.endsWith(".html");
+		return href.matches("http://mysql12.f4.htw-berlin.de/crawl/");
 	}
 
 	/**
@@ -34,6 +32,8 @@ public class MyCrawler extends WebCrawler {
 	 */
 	@Override
 	public void visit(Page page) {
+		
+		PageNode pageNode = new PageNode(page);
 		// Do nothing by default
 		// Sub-classed can override this to add their custom functionality
 		int docid = page.getWebURL().getDocid();
@@ -62,16 +62,22 @@ public class MyCrawler extends WebCrawler {
 			System.out.println("Html length: " + html.length());
 			System.out.println("Number of outgoing links: " + links.size());
 		}
-
-		Header[] responseHeaders = page.getFetchResponseHeaders();
-		if (responseHeaders != null) {
-			System.out.println("Response headers:");
-			for (Header header : responseHeaders) {
-				System.out.println("\t" + header.getName() + ": "
-						+ header.getValue());
-			}
+		
+		System.out.println("PageNodeURL: '" + pageNode.getURL() + "'");
+		System.out.println("PageNodeLinks: '" + pageNode.getCountOutgoingLinks() + "'");
+		
+		pageNode = pageNode.getPageNode(5);
+		System.out.println("PageNodeURL2: '" + pageNode.getURL() + "'");
+		System.out.println("PageNodeLinks2: " + pageNode.getCountOutgoingLinks());
+	}
+	
+	public void buildPageGraph(Page page) {
+		PageNode pageNode = new PageNode(page);
+		List<PageNode> linksOfPage = new ArrayList<PageNode>();
+		int otherNodes = pageNode.getCountOutgoingLinks();
+		for (int i = 0; i < otherNodes; i++) {
+			linksOfPage.add((pageNode.getPageNode(i)));
 		}
-		System.out.println("=============");
 	}
 
 	public List<WebURL> pickHTML(List<WebURL> links) {
@@ -84,5 +90,10 @@ public class MyCrawler extends WebCrawler {
 			}
 		}
 		return result;
+	}
+	
+	private List<WebURL> getOutGoingLinks(Page page) {
+		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+		return htmlParseData.getOutgoingUrls();
 	}
 }

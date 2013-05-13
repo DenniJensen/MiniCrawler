@@ -14,7 +14,7 @@ public class App {
 	 */
 	public static void main(String[] args) throws Exception {
 		String crawlStorageFolder = "crawl";
-		int numberOfCrawlers = 1;
+		int numberOfCrawlers = 7;
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
