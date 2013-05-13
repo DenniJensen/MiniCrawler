@@ -2,7 +2,6 @@ package Datenanalyse.Uebung1;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.http.Header;
 
@@ -12,11 +11,8 @@ import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 public class MyCrawler extends WebCrawler {
-	private final static Pattern FILTERS = Pattern
-			.compile(".*(\\.(css|js|bmp|gif|jpe?g"
-			+ "|png|tiff?|mid|mp2|mp3|mp4"
-			+ "|wav|avi|mov|mpeg|ram|m4v|pdf"
-			+ "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+	public MyCrawler() {
+	}
 
 	/**
 	 * You should implement this function to specify whether the given url
@@ -25,14 +21,15 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/d");
+		return href.startsWith("http://mysql12.f4.htw-berlin.de/d0");
 	}
 
 	/**
 	 * Classes that extends WebCrawler can overwrite this function to process
 	 * the content of the fetched and parsed page.
-	 *
-	 * @param page the page object that is just fetched and parsed.
+	 * 
+	 * @param page
+	 *            the page object that is just fetched and parsed.
 	 */
 	@Override
 	public void visit(Page page) {
