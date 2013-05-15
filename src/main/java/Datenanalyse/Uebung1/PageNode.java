@@ -14,10 +14,11 @@ import edu.uci.ics.crawler4j.url.WebURL;
 public class PageNode {
 	private Page headPage;
 	private List<PageNode> outgoingLinks;
+	private List<PageNode> incomingLinks;
 
 	public PageNode(Page page) {
 		this.headPage = page;
-		initLinks();
+		//initLinks();
 	}
 
 	public PageNode(WebURL pageURL) {
@@ -39,6 +40,18 @@ public class PageNode {
 	
 	public PageNode getPageNode(int index) {
 		return this.outgoingLinks.get(index);
+	}
+	
+	public boolean hasPageAsNode(Page page) {
+		String headPageUrl = this.headPage.getWebURL().getURL();
+		String compareUrl = page.getWebURL().getURL();
+		boolean isPageNode = false;
+		if (headPageUrl.equals(compareUrl)) {
+			isPageNode = true;
+		} else {
+			isPageNode = false;
+		}
+		return isPageNode;
 	}
 
 	public boolean isLinkedWithPage(Page page) {

@@ -2,14 +2,14 @@ package Datenanalyse.Uebung1;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.http.Header;
-
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 public class MyCrawler extends WebCrawler {
+	private List<PageNode> pageNodes;
+
 	public MyCrawler() {
 	}
 
@@ -32,10 +32,27 @@ public class MyCrawler extends WebCrawler {
 	 */
 	@Override
 	public void visit(Page page) {
+		writePageInformation(page);
 		
-		PageNode pageNode = new PageNode(page);
-		// Do nothing by default
-		// Sub-classed can override this to add their custom functionality
+		if (isPageLinkedToPageNode(page)) {
+			
+		} else {
+			PageNode pageNode = new PageNode(page);
+			pageNodes.add(pageNode);
+		}
+		
+
+		System.out.println("PageNodeURL: '" + pageNode.getURL() + "'");
+		System.out.println("PageNodeLinks: '"
+				+ pageNode.getCountOutgoingLinks() + "'");
+
+		pageNode = pageNode.getPageNode(5);
+		System.out.println("PageNodeURL2: '" + pageNode.getURL() + "'");
+		System.out.println("PageNodeLinks2: "
+				+ pageNode.getCountOutgoingLinks());
+	}
+
+	public void writePageInformation(Page page) {
 		int docid = page.getWebURL().getDocid();
 		String url = page.getWebURL().getURL();
 		String domain = page.getWebURL().getDomain();
@@ -51,33 +68,34 @@ public class MyCrawler extends WebCrawler {
 		System.out.println("Path: '" + path + "'");
 		System.out.println("Parent page: " + parentUrl);
 		System.out.println("Anchor text: " + anchor);
-		List<WebURL> links = new ArrayList<WebURL>();
 
 		if (page.getParseData() instanceof HtmlParseData) {
-			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-			String text = htmlParseData.getText();
-			String html = htmlParseData.getHtml();
-			links = pickHTML(htmlParseData.getOutgoingUrls());
-			System.out.println("Text length: " + text.length());
-			System.out.println("Html length: " + html.length());
-			System.out.println("Number of outgoing links: " + links.size());
+			writeHTMLParseDataInformation(page);
 		}
-		
-		System.out.println("PageNodeURL: '" + pageNode.getURL() + "'");
-		System.out.println("PageNodeLinks: '" + pageNode.getCountOutgoingLinks() + "'");
-		
-		pageNode = pageNode.getPageNode(5);
-		System.out.println("PageNodeURL2: '" + pageNode.getURL() + "'");
-		System.out.println("PageNodeLinks2: " + pageNode.getCountOutgoingLinks());
 	}
-	
+
+	private void writeHTMLParseDataInformation(Page page) {
+		List<WebURL> links = new ArrayList<WebURL>();
+		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+		String text = htmlParseData.getText();
+		String html = htmlParseData.getHtml();
+		links = pickHTML(htmlParseData.getOutgoingUrls());
+		System.out.println("Text length: " + text.length());
+		System.out.println("Html length: " + html.length());
+		System.out.println("Number of outgoing links: " + links.size());
+	}
+
 	public void buildPageGraph(Page page) {
-		PageNode pageNode = new PageNode(page);
-		List<PageNode> linksOfPage = new ArrayList<PageNode>();
-		int otherNodes = pageNode.getCountOutgoingLinks();
-		for (int i = 0; i < otherNodes; i++) {
-			linksOfPage.add((pageNode.getPageNode(i)));
+		
+	}
+
+	public boolean isPageLinkedToPageNode(Page page) {
+		boolean hasPageAsNode = false;
+		for (PageNode pageNode : pageNodes) {
+			if (pageNode.hasPageAsNode(page))
+				return true;
 		}
+		return hasPageAsNode;
 	}
 
 	public List<WebURL> pickHTML(List<WebURL> links) {
@@ -91,7 +109,7 @@ public class MyCrawler extends WebCrawler {
 		}
 		return result;
 	}
-	
+
 	private List<WebURL> getOutGoingLinks(Page page) {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		return htmlParseData.getOutgoingUrls();
