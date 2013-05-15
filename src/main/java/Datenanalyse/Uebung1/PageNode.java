@@ -113,10 +113,15 @@ public class PageNode {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		return htmlParseData.getOutgoingUrls();
 	}
-
-	/*
-	 * public String toString() { String resultString = headPage + ":"; if
-	 * (hasOutgoingLinks()) { for (String link : links) { resultString += "," +
-	 * link; } } return resultString; }
-	 */
+	
+	public String toString() {
+		String resultString ="";
+		for (PageNode pageNode : this.outgoingLinks) {
+			resultString += pageNode.headPage.getWebURL().getAnchor() + ":";
+			for (PageNode linkOfPageNode : pageNode.outgoingLinks) {
+				resultString += "," + linkOfPageNode.headPage.getWebURL().getAnchor();
+			}
+		}
+		return resultString;
+	}
 }

@@ -33,23 +33,15 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 		writePageInformation(page);
-		
 		if (isPageLinkedToPageNode(page)) {
-			
+
 		} else {
 			PageNode pageNode = new PageNode(page);
 			pageNodes.add(pageNode);
+			// TODO outgoingLinks filter HTML only
+			// TODO incomingLinks
 		}
-		
-
-		System.out.println("PageNodeURL: '" + pageNode.getURL() + "'");
-		System.out.println("PageNodeLinks: '"
-				+ pageNode.getCountOutgoingLinks() + "'");
-
-		pageNode = pageNode.getPageNode(5);
-		System.out.println("PageNodeURL2: '" + pageNode.getURL() + "'");
-		System.out.println("PageNodeLinks2: "
-				+ pageNode.getCountOutgoingLinks());
+		System.out.println(pageNodes.toString());
 	}
 
 	public void writePageInformation(Page page) {
@@ -74,6 +66,31 @@ public class MyCrawler extends WebCrawler {
 		}
 	}
 
+	public boolean isPageLinkedToPageNode(Page page) {
+		boolean hasPageAsNode = false;
+		for (PageNode pageNode : pageNodes) {
+			if (pageNode.hasPageAsNode(page))
+				return true;
+		}
+		return hasPageAsNode;
+	}
+
+	public void buildPageGraph(Page page) {
+		//TODO
+	}
+
+	public List<WebURL> pickHTML(List<WebURL> links) {
+		List<WebURL> result = new ArrayList<WebURL>();
+		boolean isHTMLEnding = false;
+		for (WebURL url : links) {
+			isHTMLEnding = url.getURL().endsWith(".html");
+			if (isHTMLEnding) {
+				result.add(url);
+			}
+		}
+		return result;
+	}
+
 	private void writeHTMLParseDataInformation(Page page) {
 		List<WebURL> links = new ArrayList<WebURL>();
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
@@ -85,33 +102,9 @@ public class MyCrawler extends WebCrawler {
 		System.out.println("Number of outgoing links: " + links.size());
 	}
 
-	public void buildPageGraph(Page page) {
-		
-	}
-
-	public boolean isPageLinkedToPageNode(Page page) {
-		boolean hasPageAsNode = false;
-		for (PageNode pageNode : pageNodes) {
-			if (pageNode.hasPageAsNode(page))
-				return true;
-		}
-		return hasPageAsNode;
-	}
-
-	public List<WebURL> pickHTML(List<WebURL> links) {
-		List<WebURL> result = new ArrayList<WebURL>();
-		boolean endOnHTMLTag = false;
-		for (WebURL url : links) {
-			endOnHTMLTag = url.getURL().endsWith(".html");
-			if (endOnHTMLTag) {
-				result.add(url);
-			}
-		}
-		return result;
-	}
-
 	private List<WebURL> getOutGoingLinks(Page page) {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		return htmlParseData.getOutgoingUrls();
 	}
+
 }
