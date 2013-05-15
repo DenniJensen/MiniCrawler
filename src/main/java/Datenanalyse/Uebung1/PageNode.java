@@ -18,16 +18,14 @@ public class PageNode {
 
 	public PageNode(Page page) {
 		this.headPage = page;
-		//initLinks();
+		this.outgoingLinks = new ArrayList<PageNode>();
+		this.incomingLinks = new ArrayList<PageNode>();
+		initLinks();
 	}
 
 	public PageNode(WebURL pageURL) {
 		this.headPage = new Page(pageURL);
-		//initLinks();
-	}
-	
-	public void setPageNodeLinks(List<PageNode> links) {
-		this.outgoingLinks = links;
+		// initLinks();
 	}
 
 	public int getCountOutgoingLinks() {
@@ -37,11 +35,11 @@ public class PageNode {
 	public String getURL() {
 		return headPage.getWebURL().getURL();
 	}
-	
+
 	public PageNode getPageNode(int index) {
 		return this.outgoingLinks.get(index);
 	}
-	
+
 	public boolean hasPageAsNode(Page page) {
 		String headPageUrl = this.headPage.getWebURL().getURL();
 		String compareUrl = page.getWebURL().getURL();
@@ -86,6 +84,14 @@ public class PageNode {
 		return hasLinks;
 	}
 
+	public boolean hasIncomingLinks() {
+		boolean hasLinks = false;
+		if (this.incomingLinks.size() > 0) {
+			hasLinks = true;
+		}
+		return hasLinks;
+	}
+
 	public List<WebURL> pickHTML(List<WebURL> links) {
 		List<WebURL> result = new ArrayList<WebURL>();
 		boolean endOnHTMLTag = false;
@@ -98,6 +104,15 @@ public class PageNode {
 		return result;
 	}
 
+	private void initSublinks() {
+		int size = getCountOutgoingLinks();
+		for (int i = 0; i < size; i++) {
+			PageNode pN = new PageNode(outgoingLinks.get(i).headPage);
+			outgoingLinks.set(i, pN);
+		}
+	}
+
+	// TODO go for check
 	private void initLinks() {
 		List<WebURL> links = getOutGoingLinks(headPage);
 		links = pickHTML(links);
@@ -113,15 +128,17 @@ public class PageNode {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		return htmlParseData.getOutgoingUrls();
 	}
-	
+
+	// TODO check
+	@Override
 	public String toString() {
-		String resultString ="";
-		for (PageNode pageNode : this.outgoingLinks) {
-			resultString += pageNode.headPage.getWebURL().getAnchor() + ":";
-			for (PageNode linkOfPageNode : pageNode.outgoingLinks) {
-				resultString += "," + linkOfPageNode.headPage.getWebURL().getAnchor();
-			}
+		String resultString = "";
+		resultString += this.headPage.getWebURL().getURL();
+		for (PageNode pN : outgoingLinks) {
+			resultString += "\n" + pN.headPage.getWebURL().getAnchor() + ":"
+					+ "links: ";
 		}
+		resultString += "\n\t links: " + getCountOutgoingLinks();
 		return resultString;
 	}
 }

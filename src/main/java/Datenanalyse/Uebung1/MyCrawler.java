@@ -5,10 +5,12 @@ import java.util.List;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
+import edu.uci.ics.crawler4j.parser.ParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 public class MyCrawler extends WebCrawler {
 	private List<PageNode> pageNodes;
+	private PageNode headPage;
 
 	public MyCrawler() {
 	}
@@ -33,15 +35,28 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 		writePageInformation(page);
-		if (isPageLinkedToPageNode(page)) {
-
+		/*if (isPageNode(page)) {
+			System.out.println("###################");
 		} else {
 			PageNode pageNode = new PageNode(page);
 			pageNodes.add(pageNode);
+			System.out.println("###################");
 			// TODO outgoingLinks filter HTML only
 			// TODO incomingLinks
-		}
-		System.out.println(pageNodes.toString());
+		}*/
+
+		
+		headPage = new PageNode(page);
+		System.out.println("###################");
+		String test = headPage.toString();
+		System.out.println(test);
+		System.out.println("###################");
+	}
+	
+	public void buildPageGraph(Page page) {
+		//TODO building a graph for the page rank
+		this.headPage = new PageNode(page);
+		
 	}
 
 	public void writePageInformation(Page page) {
@@ -62,11 +77,13 @@ public class MyCrawler extends WebCrawler {
 		System.out.println("Anchor text: " + anchor);
 
 		if (page.getParseData() instanceof HtmlParseData) {
+			ParseData parseData = (ParseData) getHtmlLinkOnly(page);
+			page.setParseData(parseData);
 			writeHTMLParseDataInformation(page);
 		}
 	}
 
-	public boolean isPageLinkedToPageNode(Page page) {
+	public boolean isPageNode(Page page) {
 		boolean hasPageAsNode = false;
 		for (PageNode pageNode : pageNodes) {
 			if (pageNode.hasPageAsNode(page))
@@ -75,11 +92,7 @@ public class MyCrawler extends WebCrawler {
 		return hasPageAsNode;
 	}
 
-	public void buildPageGraph(Page page) {
-		//TODO
-	}
-
-	public List<WebURL> pickHTML(List<WebURL> links) {
+	public List<WebURL> getHtmlLinkOnly(List<WebURL> links) {
 		List<WebURL> result = new ArrayList<WebURL>();
 		boolean isHTMLEnding = false;
 		for (WebURL url : links) {
@@ -96,7 +109,7 @@ public class MyCrawler extends WebCrawler {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		String text = htmlParseData.getText();
 		String html = htmlParseData.getHtml();
-		links = pickHTML(htmlParseData.getOutgoingUrls());
+		links = htmlParseData.getOutgoingUrls();
 		System.out.println("Text length: " + text.length());
 		System.out.println("Html length: " + html.length());
 		System.out.println("Number of outgoing links: " + links.size());
@@ -105,6 +118,13 @@ public class MyCrawler extends WebCrawler {
 	private List<WebURL> getOutGoingLinks(Page page) {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		return htmlParseData.getOutgoingUrls();
+	}
+	
+	private HtmlParseData getHtmlLinkOnly(Page page) {
+		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+		List<WebURL> links = getHtmlLinkOnly(htmlParseData.getOutgoingUrls());
+		htmlParseData.setOutgoingUrls(links);
+		return htmlParseData;
 	}
 
 }
