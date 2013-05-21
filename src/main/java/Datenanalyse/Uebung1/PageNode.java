@@ -104,12 +104,20 @@ public class PageNode {
 		return result;
 	}
 
-	private void initSublinks() {
-		int size = getCountOutgoingLinks();
-		for (int i = 0; i < size; i++) {
-			PageNode pN = new PageNode(outgoingLinks.get(i).headPage);
-			outgoingLinks.set(i, pN);
+	// TODO check
+	@Override
+	public String toString() {
+		String resultString = "";
+		resultString += this.headPage.getWebURL().getURL();
+		for (PageNode pN : outgoingLinks) {
+			resultString += "\n" + pN.headPage.getWebURL().getAnchor() + ":"
+					+ "links: ";
 		}
+		resultString += "\n\t links: " + getCountOutgoingLinks();
+		return resultString;
+	}
+
+	private void initSublinks() {
 	}
 
 	// TODO go for check
@@ -128,17 +136,6 @@ public class PageNode {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		return htmlParseData.getOutgoingUrls();
 	}
-
-	// TODO check
-	@Override
-	public String toString() {
-		String resultString = "";
-		resultString += this.headPage.getWebURL().getURL();
-		for (PageNode pN : outgoingLinks) {
-			resultString += "\n" + pN.headPage.getWebURL().getAnchor() + ":"
-					+ "links: ";
-		}
-		resultString += "\n\t links: " + getCountOutgoingLinks();
-		return resultString;
-	}
+	
+	//TODO calculate page Rank
 }

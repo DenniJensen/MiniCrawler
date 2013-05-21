@@ -13,8 +13,10 @@ public class App {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+		//TODO graph
+		//TODO page rank
 		String crawlStorageFolder = "crawl";
-		int numberOfCrawlers = 7;
+		int numberOfCrawlers = 1;
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
@@ -26,5 +28,9 @@ public class App {
 
 		crawlController.addSeed("http://mysql12.f4.htw-berlin.de/crawl/");
 		crawlController.start(MyCrawler.class, numberOfCrawlers);
+	}
+	
+	private static void addPageNodeToPageGraph() {
+		
 	}
 }
