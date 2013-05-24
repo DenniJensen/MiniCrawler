@@ -8,43 +8,79 @@ import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 /**
+ * A node of page is a page with outgoing and incoming pages.
+ * 
  * @author Dennis Haegler - s0532338
  * 
  */
 public class PageNode {
+	/** The page of the page node */
 	private Page headPage;
+
+	/** List of outgoing links from the page */
 	private List<PageNode> outgoingLinks;
+
+	/** List of incoming links to the page */
 	private List<PageNode> incomingLinks;
 
+	/**
+	 * Constructs a page node from a given page. The given page will be a page
+	 * node and could have outgoing links witch will be initialized and saved in
+	 * a list of outgoing links.
+	 * 
+	 * @param page
+	 */
 	public PageNode(Page page) {
 		this.headPage = page;
 		this.outgoingLinks = new ArrayList<PageNode>();
 		this.incomingLinks = new ArrayList<PageNode>();
-		initLinks();
+		initOutgoingLinks();
 	}
 
+	/**
+	 * Constructs a page node from a given page. The given page will be a page
+	 * node and could have outgoing links witch will be initialized and saved in
+	 * a list of outgoing links.
+	 * 
+	 * @param pageURL
+	 */
 	public PageNode(WebURL pageURL) {
 		this.headPage = new Page(pageURL);
 		// initLinks();
 	}
 
-	public int getCountOutgoingLinks() {
+	/**
+	 * Returns the number of outgoing links
+	 */
+	public int getNumberOutgoingLinks() {
 		return outgoingLinks.size();
 	}
 
+	/**
+	 * Returns the url from the page node. 
+	 */
 	public String getURL() {
 		return headPage.getWebURL().getURL();
 	}
 
-	public PageNode getPageNode(int index) {
-		return this.outgoingLinks.get(index);
+	/**
+	 * 
+	 * @param page
+	 * @return
+	 */
+	public boolean isPageNode(Page page) {
+		return isPageNode(page.getWebURL().getURL());
 	}
-
-	public boolean hasPageAsNode(Page page) {
+	
+	/**
+	 * 
+	 * @param webUrl
+	 * @return
+	 */
+	public boolean isPageNode(String webUrl) {
 		String headPageUrl = this.headPage.getWebURL().getURL();
-		String compareUrl = page.getWebURL().getURL();
 		boolean isPageNode = false;
-		if (headPageUrl.equals(compareUrl)) {
+		if (headPageUrl.equals(webUrl)) {
 			isPageNode = true;
 		} else {
 			isPageNode = false;
@@ -52,7 +88,12 @@ public class PageNode {
 		return isPageNode;
 	}
 
-	public boolean isLinkedWithPage(Page page) {
+	/**
+	 * 
+	 * @param page
+	 * @return
+	 */
+	public boolean containsInOutgoingLinks(Page page) {
 		String compareUrl = page.getWebURL().getURL();
 		String linkUrl = "";
 		for (PageNode link : this.outgoingLinks) {
@@ -64,7 +105,12 @@ public class PageNode {
 		return false;
 	}
 
-	public boolean isLinkedWithPageNode(PageNode pageNode) {
+	/**
+	 * 
+	 * @param pageNode
+	 * @return
+	 */
+	public boolean containsInOutgoingLinks(PageNode pageNode) {
 		String compareUrl = pageNode.getURL();
 		String linkUrl = "";
 		for (PageNode link : outgoingLinks) {
@@ -76,6 +122,10 @@ public class PageNode {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean hasOutgoingLinks() {
 		boolean hasLinks = false;
 		if (this.outgoingLinks.size() > 0) {
@@ -84,6 +134,10 @@ public class PageNode {
 		return hasLinks;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean hasIncomingLinks() {
 		boolean hasLinks = false;
 		if (this.incomingLinks.size() > 0) {
@@ -92,6 +146,11 @@ public class PageNode {
 		return hasLinks;
 	}
 
+	/**
+	 * 
+	 * @param links
+	 * @return
+	 */
 	public List<WebURL> pickHTML(List<WebURL> links) {
 		List<WebURL> result = new ArrayList<WebURL>();
 		boolean endOnHTMLTag = false;
@@ -105,15 +164,13 @@ public class PageNode {
 	}
 
 	// TODO check
-	@Override
 	public String toString() {
 		String resultString = "";
-		resultString += this.headPage.getWebURL().getURL();
+		resultString += this.headPage.getWebURL().getURL() + ": ";
 		for (PageNode pN : outgoingLinks) {
-			resultString += "\n" + pN.headPage.getWebURL().getAnchor() + ":"
-					+ "links: ";
+			resultString += pN.headPage.getWebURL().getAnchor() + " ";
 		}
-		resultString += "\n\t links: " + getCountOutgoingLinks();
+		resultString += "\n\t links: " + getNumberOutgoingLinks();
 		return resultString;
 	}
 
@@ -121,7 +178,10 @@ public class PageNode {
 	}
 
 	// TODO go for check
-	private void initLinks() {
+	/**
+	 * 
+	 */
+	private void initOutgoingLinks() {
 		List<WebURL> links = getOutGoingLinks(headPage);
 		links = pickHTML(links);
 		List<PageNode> pageNodes = new ArrayList<PageNode>();
@@ -132,10 +192,15 @@ public class PageNode {
 		this.outgoingLinks = pageNodes;
 	}
 
+	/**
+	 * 
+	 * @param page
+	 * @return
+	 */
 	private List<WebURL> getOutGoingLinks(Page page) {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		return htmlParseData.getOutgoingUrls();
 	}
-	
-	//TODO calculate page Rank
+
+	// TODO calculate page Rank
 }

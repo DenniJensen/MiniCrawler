@@ -3,7 +3,13 @@ package Datenanalyse.Uebung1;
 import java.util.ArrayList;
 
 import edu.uci.ics.crawler4j.crawler.Page;
+import edu.uci.ics.crawler4j.url.WebURL;
 
+/**
+ * 
+ * @author Dennis Haegler - s0532338
+ *
+ */
 public class PageGraph {
 	/** Array list of page nodes */
 	private ArrayList<PageNode> pageNodes;
@@ -23,13 +29,24 @@ public class PageGraph {
 	}
 
 	/**
-	 * Adds a page node to the array list of page nodes
+	 * Adds a page node to the array list of page nodes.
 	 * 
 	 * @param pageNode
 	 *            the page node to add to the list.
 	 */
 	public void addPageNode(PageNode pageNode) {
 		pageNodes.add(pageNode);
+	}
+	
+	/**
+	 * Adds a page as page node to the array list of page nodes.
+	 * 
+	 * @param pageNode
+	 *            the page node to add to the list.
+	 */
+	public void addPageNode(Page page) {
+		PageNode pN = new PageNode(page);
+		pageNodes.add(pN);
 	}
 
 	/**
@@ -70,12 +87,12 @@ public class PageGraph {
 	}
 
 	/**
-	 * Returns true if the url of the given page will be found in the graph,
-	 * otherwise the url will be not found it returns false.
+	 * Returns true if the URL of the given page will be found in the graph,
+	 * otherwise the URL will be not found it returns false.
 	 * 
 	 * @param page
 	 *            the page witch will be searched in the graph.
-	 * @return True if the url of will be found in the graph, otherwise false.
+	 * @return True if the URL of will be found in the graph, otherwise false.
 	 */
 	public boolean isPageNode(Page page) {
 		String url = page.getWebURL().getURL();
@@ -83,12 +100,12 @@ public class PageGraph {
 	}
 
 	/**
-	 * Returns true if the url will be found in the graph, otherwise the url
+	 * Returns true if the URL will be found in the graph, otherwise the URL
 	 * will be not found it returns false.
 	 * 
 	 * 
-	 * @param url an url witch will be searched in the graph.
-	 * @return true if the given url will be found in the graph.
+	 * @param url an URL witch will be searched in the graph.
+	 * @return true if the given URL will be found in the graph.
 	 */
 	public boolean isPageNode(String url) {
 		for (PageNode pageNode : pageNodes) {
