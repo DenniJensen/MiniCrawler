@@ -45,6 +45,11 @@ public class MyCrawler extends WebCrawler {
 		} else {
 			pageGraph.addPageNode(page);
 		}
+		System.out.println(toString());
+	}
+	
+	public String toString() {
+		return pageGraph.toString();
 	}
 
 	public void writePageInformation(Page page) {
@@ -100,5 +105,4 @@ public class MyCrawler extends WebCrawler {
 		htmlParseData.setOutgoingUrls(links);
 		return htmlParseData;
 	}
-
 }

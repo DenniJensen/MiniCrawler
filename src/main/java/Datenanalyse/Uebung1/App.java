@@ -30,12 +30,13 @@ public class App {
 		RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
 		RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
 		CrawlController crawlController = new CrawlController(config, pageFetcher, robotstxtServer);
+		
+		MyCrawler myCrawler = new MyCrawler();
 
 		crawlController.addSeed("http://mysql12.f4.htw-berlin.de/crawl/");
 		crawlController.start(MyCrawler.class, numberOfCrawlers);
-	}
-	
-	private static void addPageNodeToPageGraph() {
+		System.out.println(myCrawler.toString());
+		
 		
 	}
 }

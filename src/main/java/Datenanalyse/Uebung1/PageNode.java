@@ -78,14 +78,8 @@ public class PageNode {
 	 * @return
 	 */
 	public boolean isPageNode(String webUrl) {
-		String headPageUrl = this.headPage.getWebURL().getURL();
-		boolean isPageNode = false;
-		if (headPageUrl.equals(webUrl)) {
-			isPageNode = true;
-		} else {
-			isPageNode = false;
-		}
-		return isPageNode;
+		String headPageUrl = this.headPage.getWebURL().getURL().toLowerCase();
+		return (headPageUrl.toLowerCase().equals(webUrl));
 	}
 
 	/**
@@ -94,15 +88,8 @@ public class PageNode {
 	 * @return
 	 */
 	public boolean containsInOutgoingLinks(Page page) {
-		String compareUrl = page.getWebURL().getURL();
-		String linkUrl = "";
-		for (PageNode link : this.outgoingLinks) {
-			compareUrl = link.getURL();
-			if (compareUrl.equals(linkUrl)) {
-				return true;
-			}
-		}
-		return false;
+		String webUrl = page.getWebURL().getURL();
+		return containsInOutgoingLinks(webUrl);
 	}
 
 	/**
@@ -111,11 +98,13 @@ public class PageNode {
 	 * @return
 	 */
 	public boolean containsInOutgoingLinks(PageNode pageNode) {
-		String compareUrl = pageNode.getURL();
-		String linkUrl = "";
+		String webUrl = pageNode.getURL();
+		return containsInOutgoingLinks(webUrl);
+	}
+	
+	public boolean containsInOutgoingLinks(String webUrl) {
 		for (PageNode link : outgoingLinks) {
-			linkUrl = link.getURL();
-			if (compareUrl.equals(linkUrl)) {
+			if (link.isPageNode(webUrl)) {
 				return true;
 			}
 		}
@@ -165,16 +154,14 @@ public class PageNode {
 
 	// TODO check
 	public String toString() {
-		String resultString = "";
-		resultString += this.headPage.getWebURL().getURL() + ": ";
+		String resultString = "Page node URL: ";
+		resultString += this.headPage.getWebURL().getURL() + "\n\t";
+		resultString += this.headPage.getWebURL().getAnchor() + ": ";
 		for (PageNode pN : outgoingLinks) {
 			resultString += pN.headPage.getWebURL().getAnchor() + " ";
 		}
 		resultString += "\n\t links: " + getNumberOutgoingLinks();
 		return resultString;
-	}
-
-	private void initSublinks() {
 	}
 
 	// TODO go for check

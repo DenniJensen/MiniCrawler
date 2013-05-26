@@ -115,4 +115,18 @@ public class PageGraph {
 		}
 		return false;
 	}
+	
+	/**
+	 * Returns a string with information of the page graph.
+	 * The String includes all informations of page nodes from the graph.
+	 * 
+	 * @return string with information of the page nodes in the page graph.
+	 */
+	public String toString() {
+		String result = "";
+		for (PageNode pageNode : pageNodes) {
+			result += pageNode.toString();
+		}
+		return result;
+	}
 }
