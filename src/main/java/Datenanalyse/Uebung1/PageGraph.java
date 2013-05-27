@@ -2,15 +2,19 @@ package Datenanalyse.Uebung1;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 import edu.uci.ics.crawler4j.crawler.Page;
-import edu.uci.ics.crawler4j.url.WebURL;
 
 /**
  * 
  * @author Dennis Haegler - s0532338
- *
+ * 
  */
 public class PageGraph {
+
+	static Logger log = Logger.getLogger(PageGraph.class);
+
 	/** Array list of page nodes */
 	private ArrayList<PageNode> pageNodes;
 
@@ -37,7 +41,7 @@ public class PageGraph {
 	public void addPageNode(PageNode pageNode) {
 		pageNodes.add(pageNode);
 	}
-	
+
 	/**
 	 * Adds a page as page node to the array list of page nodes.
 	 * 
@@ -48,30 +52,30 @@ public class PageGraph {
 		PageNode pN = new PageNode(page);
 		pageNodes.add(pN);
 	}
-	
+
 	/**
-	 * Adds a page as page node to the page graph in case, that the 
-	 * page is not already a page node in the page graph.
+	 * Adds a page as page node to the page graph in case, that the page is not
+	 * already a page node in the page graph.
 	 * 
 	 * @param page
 	 */
 	public void addNoneExcistingPageNode(Page page) {
 		if (this.isPageNode(page)) {
-			
+
 		} else {
 			this.addPageNode(page);
 		}
 	}
-	
+
 	/**
-	 * Adds a page node to the page graph if the 
-	 * page note is not already a page node in the page graph.
-	 *  
+	 * Adds a page node to the page graph if the page note is not already a page
+	 * node in the page graph.
+	 * 
 	 * @param pageNode
 	 */
 	public void addNoneExcistingPageNode(PageNode pageNode) {
 		if (this.isPageNode(pageNode)) {
-			
+
 		} else {
 			this.addPageNode(pageNode);
 		}
@@ -97,7 +101,45 @@ public class PageGraph {
 	public PageNode getPageNode(int index) {
 		return pageNodes.get(index);
 	}
-	
+
+	/**
+	 * 
+	 * @param pageNode
+	 * @return
+	 */
+	public PageNode getPageNode(PageNode pageNode) {
+		String webUrl = pageNode.getURL();
+		return getPageNode(webUrl);
+	}
+
+	/**
+	 * 
+	 * @param page
+	 * @return
+	 */
+	public PageNode getPageNode(Page page) {
+		String webUrl = page.getWebURL().getURL();
+		return getPageNode(webUrl);
+	}
+
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public PageNode getPageNode(String url) {
+		for (PageNode pageNode : pageNodes) {
+			if (pageNode.isPageNode(url)) {
+				return pageNode;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public int size() {
 		return pageNodes.size();
 	}
@@ -115,7 +157,7 @@ public class PageGraph {
 	 */
 	public boolean isPageNode(PageNode pageNode) {
 		String url = pageNode.getURL();
-		return isPageNode(url);
+		return existAsPageNode(url);
 	}
 
 	/**
@@ -128,7 +170,7 @@ public class PageGraph {
 	 */
 	public boolean isPageNode(Page page) {
 		String url = page.getWebURL().getURL();
-		return isPageNode(url);
+		return existAsPageNode(url);
 	}
 
 	/**
@@ -136,10 +178,11 @@ public class PageGraph {
 	 * will be not found it returns false.
 	 * 
 	 * 
-	 * @param url an URL witch will be searched in the graph.
+	 * @param url
+	 *            an URL witch will be searched in the graph.
 	 * @return true if the given URL will be found in the graph.
 	 */
-	public boolean isPageNode(String url) {
+	public boolean existAsPageNode(String url) {
 		for (PageNode pageNode : pageNodes) {
 			if (pageNode.getURL().equals(url)) {
 				return true;
@@ -147,10 +190,10 @@ public class PageGraph {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Returns a string with information of the page graph.
-	 * The String includes all informations of page nodes from the graph.
+	 * Returns a string with information of the page graph. The String includes
+	 * all informations of page nodes from the graph.
 	 * 
 	 * @return string with information of the page nodes in the page graph.
 	 */
@@ -160,5 +203,25 @@ public class PageGraph {
 			result += "\n" + pageNode.toString() + "\n";
 		}
 		return result;
+	}
+
+	public void connectPageNodes() {
+		String url = "";
+		int numberLinks;
+		PageNode bufferNode;
+		for (PageNode pageNode : pageNodes) {
+			numberLinks = pageNode.getNumberOutgoingLinksFromHeadPage();
+			for (int i = 0; i < numberLinks; i++) {
+				url = pageNode.getOutgoingLink(i).getURL();
+				if (this.existAsPageNode(url)) {
+					bufferNode = getPageNode(url);
+					log.debug("Found page node: " + bufferNode.getURL());
+					bufferNode.addIncomingLink(pageNode);
+					pageNode.addOutgoingLink(bufferNode);
+				} else {
+
+				}
+			}
+		}
 	}
 }

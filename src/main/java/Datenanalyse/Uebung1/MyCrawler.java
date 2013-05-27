@@ -15,11 +15,16 @@ import edu.uci.ics.crawler4j.url.WebURL;
  * @author Dennis Haegler - s0532338
  */
 public class MyCrawler extends WebCrawler {
+	
 	/** Crawler stores pages in the page graph */
 	private PageGraph pageGraph;
 	
+	/** List of crawled pages. Stored from the web crawler. */
 	private ArrayList<Page> crawledPages;
 	
+	/**
+	 * Initialize the list of the crawled pages and the page graph.
+	 */
 	public void onStart() {
 		this.pageGraph = new PageGraph();
 		crawledPages = new ArrayList<Page>();
@@ -32,12 +37,11 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/d");
+		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/") && href.endsWith(".html");
 	}
 
 	/**
-	 * Classes that extends WebCrawler can overwrite this function to process
-	 * the content of the fetched and parsed page.
+	 * Handle to content of a visited page.
 	 * 
 	 * @param page
 	 *            the page object that is just fetched and parsed.
@@ -46,7 +50,6 @@ public class MyCrawler extends WebCrawler {
 	public void visit(Page page) {
 		writePageInformation(page);
 		crawledPages.add(page);
-		
 	}
 	
 	public void onBeforeExit() {
@@ -54,15 +57,16 @@ public class MyCrawler extends WebCrawler {
 		for (Page page : crawledPages) {
 			pageGraph.addNoneExcistingPageNode(page);
 		}
+		pageGraph.connectPageNodes();
 		System.out.println("Page graph size: " + pageGraph.size());
+		System.out.println(toString());
 		
-		System.out.println(pageGraph.toString());
 	}
 
 	public String toString() {
 		return pageGraph.toString();
 	}
-
+	
 	public void writePageInformation(Page page) {
 		int docid = page.getWebURL().getDocid();
 		String url = page.getWebURL().getURL();

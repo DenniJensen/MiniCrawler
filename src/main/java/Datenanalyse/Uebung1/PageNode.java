@@ -32,7 +32,7 @@ public class PageNode {
 	 */
 	public PageNode(Page page) {
 		initNewPageNode(page);
-		initOutgoingLinks();
+		initOutgoingLinks(); // TODO right Init of links
 	}
 
 	/**
@@ -54,6 +54,25 @@ public class PageNode {
 	}
 
 	/**
+	 * Returns the number of incoming links
+	 */
+	public int getNumberIncomingLinks() {
+		return outgoingLinks.size();
+	}
+
+	/**
+	 * Returns the number of outgoing links stored from crawler4j in the html
+	 * parser of the page head from the page node. The number has not to be
+	 * identical same to the size of out going links in the page not, in reason
+	 * that the out going links of the page not could be not initialized.
+	 * 
+	 * @return
+	 */
+	public int getNumberOutgoingLinksFromHeadPage() {
+		return getWebUrlsFromHeadPage(headPage).size();
+	}
+
+	/**
 	 * Returns the url from the page node.
 	 */
 	public String getURL() {
@@ -62,11 +81,85 @@ public class PageNode {
 
 	/**
 	 * 
+	 * @return
+	 */
+	public String getDomain() {
+		return headPage.getWebURL().getDomain();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getDocid() {
+		return headPage.getWebURL().getDocid();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getParentUrl() {
+		return headPage.getWebURL().getParentUrl();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getSubDomain() {
+		return headPage.getWebURL().getSubDomain();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPath() {
+		return headPage.getWebURL().getPath();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getAnchor() {
+		return headPage.getWebURL().getAnchor();
+	}
+
+	/**
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public PageNode getOutgoingLink(int index) {
+		return outgoingLinks.get(index);
+	}
+
+	/**
+	 * 
+	 * @param pageNode
+	 */
+	public void addOutgoingLink(PageNode pageNode) {
+		outgoingLinks.add(pageNode);
+	}
+
+	/**
+	 * 
+	 * @param pageNode
+	 */
+	public void addIncomingLink(PageNode pageNode) {
+		incomingLinks.add(pageNode);
+	}
+
+	/**
+	 * 
 	 * @param page
 	 * @return
 	 */
 	public boolean isPageNode(Page page) {
-		return isPageNode(page.getWebURL().getURL());
+		String webUrl = page.getWebURL().getURL();
+		return isPageNode(webUrl);
 	}
 
 	/**
@@ -76,7 +169,8 @@ public class PageNode {
 	 */
 	public boolean isPageNode(String webUrl) {
 		String headPageUrl = this.headPage.getWebURL().getURL().toLowerCase();
-		return (headPageUrl.toLowerCase().equals(webUrl));
+		webUrl = webUrl.toLowerCase();
+		return (headPageUrl.equals(webUrl));
 	}
 
 	/**
@@ -99,6 +193,11 @@ public class PageNode {
 		return containsInOutgoingLinks(webUrl);
 	}
 
+	/**
+	 * 
+	 * @param webUrl
+	 * @return
+	 */
 	public boolean containsInOutgoingLinks(String webUrl) {
 		for (PageNode link : outgoingLinks) {
 			if (link.isPageNode(webUrl)) {
@@ -149,27 +248,50 @@ public class PageNode {
 		return result;
 	}
 
-	// TODO check
+	@Override
 	public String toString() {
-		String url = headPage.getWebURL().getURL();
-		String anchor = headPage.getWebURL().getAnchor();
+		String resultString = "";
+		int docid = getDocid();
+		String url = getURL();
+		String domain = getDomain();
+		String path = getPath();
+		String subDomain = getSubDomain();
+		String parentUrl = getParentUrl();
+		String anchor = getAnchor();
 
-		String resultString = "URL: " + url + "\n";
-		resultString += "Number of Links:\t" + getNumberOutgoingLinks() + "\n";
-		resultString += "Link structur:\t\t" + anchor + ": ";
-		for (PageNode pN : outgoingLinks) {
-			resultString += pN.headPage.getWebURL().getAnchor() + " ";
-		}
+		resultString += ("Docid: " + docid + "\n");
+		resultString += ("URL: " + url);
+		resultString += ("Domain: '" + domain + "'\n");
+		resultString += ("Sub-domain: '" + subDomain + "'\n");
+		resultString += ("Path: '" + path + "'\n");
+		resultString += ("Parent page: " + parentUrl + "\n");
+		resultString += ("Anchor text: " + anchor + "\n");
+		resultString += ("Number of outgoing links: "
+				+ getNumberOutgoingLinks() + "\n");
+		resultString += ("Number of incoming links: " + getNumberIncomingLinks());
 		return resultString;
 	}
 
-	// TODO go for check
+	/**
+	 * Returns a link path string of the anchors of page node and links. Begins
+	 * by the anchor of the page node and will be continued by the anchors of
+	 * the links
+	 * 
+	 * @return
+	 */
+	public String toStringLinkPath() {
+		String resultString = getAnchor();
+		for (PageNode pN : outgoingLinks) {
+			resultString += pN.getAnchor() + " ";
+		}
+		return resultString;
+	}
 
 	/**
 	 * 
 	 */
 	private void initOutgoingLinks() {
-		List<WebURL> links = getOutGoingLinks(headPage);
+		List<WebURL> links = getWebUrlsFromHeadPage(headPage);
 		links = pickHTML(links);
 		List<PageNode> pageNodes = new ArrayList<PageNode>();
 		for (WebURL link : links) {
@@ -184,16 +306,21 @@ public class PageNode {
 	 * @param page
 	 * @return
 	 */
-	private List<WebURL> getOutGoingLinks(Page page) {
+	private List<WebURL> getWebUrlsFromHeadPage(Page page) {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		return htmlParseData.getOutgoingUrls();
 	}
 
+	/**
+	 * Initialize an empty page node by a given page.
+	 * 
+	 * @param page the new page head for the page node.
+	 */
 	protected void initNewPageNode(Page page) {
 		this.headPage = page;
 		this.outgoingLinks = new ArrayList<PageNode>();
 		this.incomingLinks = new ArrayList<PageNode>();
 	}
-	
+
 	// TODO calculate page Rank
 }
