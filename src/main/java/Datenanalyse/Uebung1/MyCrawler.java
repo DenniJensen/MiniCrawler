@@ -9,25 +9,30 @@ import edu.uci.ics.crawler4j.parser.ParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 /**
+ * Modified Crawler from WebCrawler from the crawler4j library. My Crawler
+ * contains a page graph to store the crawled pages.
  * 
  * @author Dennis Haegler - s0532338
- * 
  */
 public class MyCrawler extends WebCrawler {
+	/** Crawler stores pages in the page graph */
 	private PageGraph pageGraph;
-
-	public MyCrawler() {
+	
+	private ArrayList<Page> crawledPages;
+	
+	public void onStart() {
 		this.pageGraph = new PageGraph();
+		crawledPages = new ArrayList<Page>();
 	}
 
 	/**
-	 * You should implement this function to specify whether the given url
-	 * should be crawled or not (based on your crawling logic).
+	 * Specifies whether the given url should be crawled or not (based on your
+	 * crawling logic).
 	 */
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return href.matches("http://mysql12.f4.htw-berlin.de/crawl/");
+		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/d");
 	}
 
 	/**
@@ -40,14 +45,20 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 		writePageInformation(page);
-		if (pageGraph.isPageNode(page)) {
-
-		} else {
-			pageGraph.addPageNode(page);
-		}
-		System.out.println(toString());
+		crawledPages.add(page);
+		
 	}
 	
+	public void onBeforeExit() {
+		System.out.println("crawled Pages: " + crawledPages.size());
+		for (Page page : crawledPages) {
+			pageGraph.addNoneExcistingPageNode(page);
+		}
+		System.out.println("Page graph size: " + pageGraph.size());
+		
+		System.out.println(pageGraph.toString());
+	}
+
 	public String toString() {
 		return pageGraph.toString();
 	}
@@ -96,7 +107,7 @@ public class MyCrawler extends WebCrawler {
 		links = htmlParseData.getOutgoingUrls();
 		System.out.println("Text length: " + text.length());
 		System.out.println("Html length: " + html.length());
-		System.out.println("Number of outgoing links: " + links.size());
+		System.out.println("Number of outgoing links: " + links.size() + "\n");
 	}
 
 	private HtmlParseData getHtmlLinkOnly(Page page) {

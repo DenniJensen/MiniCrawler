@@ -31,9 +31,7 @@ public class PageNode {
 	 * @param page
 	 */
 	public PageNode(Page page) {
-		this.headPage = page;
-		this.outgoingLinks = new ArrayList<PageNode>();
-		this.incomingLinks = new ArrayList<PageNode>();
+		initNewPageNode(page);
 		initOutgoingLinks();
 	}
 
@@ -45,8 +43,7 @@ public class PageNode {
 	 * @param pageURL
 	 */
 	public PageNode(WebURL pageURL) {
-		this.headPage = new Page(pageURL);
-		// initLinks();
+		initNewPageNode(new Page(pageURL));
 	}
 
 	/**
@@ -57,7 +54,7 @@ public class PageNode {
 	}
 
 	/**
-	 * Returns the url from the page node. 
+	 * Returns the url from the page node.
 	 */
 	public String getURL() {
 		return headPage.getWebURL().getURL();
@@ -71,7 +68,7 @@ public class PageNode {
 	public boolean isPageNode(Page page) {
 		return isPageNode(page.getWebURL().getURL());
 	}
-	
+
 	/**
 	 * 
 	 * @param webUrl
@@ -101,7 +98,7 @@ public class PageNode {
 		String webUrl = pageNode.getURL();
 		return containsInOutgoingLinks(webUrl);
 	}
-	
+
 	public boolean containsInOutgoingLinks(String webUrl) {
 		for (PageNode link : outgoingLinks) {
 			if (link.isPageNode(webUrl)) {
@@ -154,17 +151,20 @@ public class PageNode {
 
 	// TODO check
 	public String toString() {
-		String resultString = "Page node URL: ";
-		resultString += this.headPage.getWebURL().getURL() + "\n\t";
-		resultString += this.headPage.getWebURL().getAnchor() + ": ";
+		String url = headPage.getWebURL().getURL();
+		String anchor = headPage.getWebURL().getAnchor();
+
+		String resultString = "URL: " + url + "\n";
+		resultString += "Number of Links:\t" + getNumberOutgoingLinks() + "\n";
+		resultString += "Link structur:\t\t" + anchor + ": ";
 		for (PageNode pN : outgoingLinks) {
 			resultString += pN.headPage.getWebURL().getAnchor() + " ";
 		}
-		resultString += "\n\t links: " + getNumberOutgoingLinks();
 		return resultString;
 	}
 
 	// TODO go for check
+
 	/**
 	 * 
 	 */
@@ -189,5 +189,11 @@ public class PageNode {
 		return htmlParseData.getOutgoingUrls();
 	}
 
+	protected void initNewPageNode(Page page) {
+		this.headPage = page;
+		this.outgoingLinks = new ArrayList<PageNode>();
+		this.incomingLinks = new ArrayList<PageNode>();
+	}
+	
 	// TODO calculate page Rank
 }

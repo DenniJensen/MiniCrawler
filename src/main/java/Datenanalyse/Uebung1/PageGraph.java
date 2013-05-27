@@ -48,6 +48,34 @@ public class PageGraph {
 		PageNode pN = new PageNode(page);
 		pageNodes.add(pN);
 	}
+	
+	/**
+	 * Adds a page as page node to the page graph in case, that the 
+	 * page is not already a page node in the page graph.
+	 * 
+	 * @param page
+	 */
+	public void addNoneExcistingPageNode(Page page) {
+		if (this.isPageNode(page)) {
+			
+		} else {
+			this.addPageNode(page);
+		}
+	}
+	
+	/**
+	 * Adds a page node to the page graph if the 
+	 * page note is not already a page node in the page graph.
+	 *  
+	 * @param pageNode
+	 */
+	public void addNoneExcistingPageNode(PageNode pageNode) {
+		if (this.isPageNode(pageNode)) {
+			
+		} else {
+			this.addPageNode(pageNode);
+		}
+	}
 
 	/**
 	 * Removes the given page node from the list.
@@ -68,6 +96,10 @@ public class PageGraph {
 	 */
 	public PageNode getPageNode(int index) {
 		return pageNodes.get(index);
+	}
+	
+	public int size() {
+		return pageNodes.size();
 	}
 
 	/**
@@ -125,7 +157,7 @@ public class PageGraph {
 	public String toString() {
 		String result = "";
 		for (PageNode pageNode : pageNodes) {
-			result += pageNode.toString();
+			result += "\n" + pageNode.toString() + "\n";
 		}
 		return result;
 	}
