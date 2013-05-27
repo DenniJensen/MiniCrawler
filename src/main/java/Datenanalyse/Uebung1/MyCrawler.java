@@ -15,13 +15,13 @@ import edu.uci.ics.crawler4j.url.WebURL;
  * @author Dennis Haegler - s0532338
  */
 public class MyCrawler extends WebCrawler {
-	
+
 	/** Crawler stores pages in the page graph */
 	private PageGraph pageGraph;
-	
+
 	/** List of crawled pages. Stored from the web crawler. */
 	private ArrayList<Page> crawledPages;
-	
+
 	/**
 	 * Initialize the list of the crawled pages and the page graph.
 	 */
@@ -37,7 +37,8 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/") && href.endsWith(".html");
+		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/d")
+				&& href.endsWith(".html");
 	}
 
 	/**
@@ -51,22 +52,42 @@ public class MyCrawler extends WebCrawler {
 		writePageInformation(page);
 		crawledPages.add(page);
 	}
-	
+
+	/**
+	 * Runs before the crawler terminates. Handle stored list of pages.
+	 */
 	public void onBeforeExit() {
 		System.out.println("crawled Pages: " + crawledPages.size());
 		for (Page page : crawledPages) {
 			pageGraph.addNoneExcistingPageNode(page);
 		}
-		pageGraph.connectPageNodes();
+		pageGraph.linkPageNodes();
 		System.out.println("Page graph size: " + pageGraph.size());
 		System.out.println(toString());
-		
+		System.out.println(toString());
+
 	}
 
+	/**
+	 * Returns a string of the page graph.
+	 * 
+	 * @return a string of the page graph.
+	 */
 	public String toString() {
 		return pageGraph.toString();
 	}
-	
+
+	/**
+	 * Returns the string of a link path of the page nodes in the page graph. A
+	 * link path is row of anchor. The first anchor is the anchor which contains
+	 * the following anchors.
+	 * 
+	 * @return the string of a link path, beginning with head page.
+	 */
+	public String toStringLinkPath() {
+		return pageGraph.toStringLinkPath();
+	}
+
 	public void writePageInformation(Page page) {
 		int docid = page.getWebURL().getDocid();
 		String url = page.getWebURL().getURL();

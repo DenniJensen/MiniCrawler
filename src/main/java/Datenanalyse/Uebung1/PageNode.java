@@ -260,7 +260,7 @@ public class PageNode {
 		String anchor = getAnchor();
 
 		resultString += ("Docid: " + docid + "\n");
-		resultString += ("URL: " + url);
+		resultString += ("URL: " + url + "\n");
 		resultString += ("Domain: '" + domain + "'\n");
 		resultString += ("Sub-domain: '" + subDomain + "'\n");
 		resultString += ("Path: '" + path + "'\n");

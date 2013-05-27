@@ -37,7 +37,6 @@ public class App {
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
-		config.setConnectionTimeout(650);
 
 		PageFetcher pageFetcher = new PageFetcher(config);
 		RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
@@ -48,7 +47,6 @@ public class App {
 			
 		crawlController.addSeed(crawlUrl);
 		crawlController.start(MyCrawler.class, numberOfCrawlers);
-		System.out.println("Finished Crawl\t"+ crawlUrl);
-		System.out.println("Result from Crawl\t"+ crawlUrl);
+		System.out.println("Finished Crawl "+ crawlUrl);
 	}
 }

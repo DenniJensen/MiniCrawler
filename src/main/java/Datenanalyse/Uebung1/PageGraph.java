@@ -205,7 +205,25 @@ public class PageGraph {
 		return result;
 	}
 
-	public void connectPageNodes() {
+	/**
+	 * Returns the string of a link path of the page nodes in the page graph. A
+	 * link path is row of anchor. The first anchor is the anchor which contains
+	 * the following anchors.
+	 * 
+	 * @return
+	 */
+	public String toStringLinkPath() {
+		String result = "";
+		for (PageNode pageNode : pageNodes) {
+			result += pageNode.toStringLinkPath() + "\n";
+		}
+		return result;
+	}
+
+	/**
+	 * Linking all page nodes with each other if they are linked.
+	 */
+	public void linkPageNodes() {
 		String url = "";
 		int numberLinks;
 		PageNode bufferNode;
@@ -218,9 +236,7 @@ public class PageGraph {
 					log.debug("Found page node: " + bufferNode.getURL());
 					bufferNode.addIncomingLink(pageNode);
 					pageNode.addOutgoingLink(bufferNode);
-				} else {
-
-				}
+				} 
 			}
 		}
 	}
