@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
+import edu.uci.ics.crawler4j.parser.ParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 /**
@@ -32,7 +33,7 @@ public class PageNode {
 	 */
 	public PageNode(Page page) {
 		initNewPageNode(page);
-		//initOutgoingLinks();
+		// initOutgoingLinks();
 	}
 
 	/**
@@ -125,6 +126,14 @@ public class PageNode {
 	 */
 	public String getAnchor() {
 		return headPage.getWebURL().getAnchor();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getAnchorWithoutSuffix() {
+		return getAnchor().split(".html")[0];
 	}
 
 	/**
@@ -250,7 +259,7 @@ public class PageNode {
 
 	@Override
 	public String toString() {
-		String resultString = "";
+		String string = "";
 		int docid = getDocid();
 		String url = getURL();
 		String domain = getDomain();
@@ -258,33 +267,68 @@ public class PageNode {
 		String subDomain = getSubDomain();
 		String parentUrl = getParentUrl();
 		String anchor = getAnchor();
+		string += ("Docid: " + docid + "\n");
+		string += ("URL: " + url + "\nf");
+		string += ("Domain: '" + domain + "'\n");
+		string += ("Sub-domain: '" + subDomain + "'\n");
+		string += ("Path: '" + path + "'\n");
+		string += ("Parent page: " + parentUrl + "\n");
+		string += ("Anchor text: " + anchor + "\n");
+		string += toStringHtmlParseInformation();
+		string += ("Number of outgoing links: " + getNumberOutgoingLinks() + "\n");
+		string += ("Number of incoming links: " + getNumberIncomingLinks());
+		return string;
+	}
 
-		resultString += ("Docid: " + docid + "\n");
-		resultString += ("URL: " + url + "\nf");
-		resultString += ("Domain: '" + domain + "'\n");
-		resultString += ("Sub-domain: '" + subDomain + "'\n");
-		resultString += ("Path: '" + path + "'\n");
-		resultString += ("Parent page: " + parentUrl + "\n");
-		resultString += ("Anchor text: " + anchor + "\n");
-		resultString += ("Number of outgoing links: "
-				+ getNumberOutgoingLinks() + "\n");
-		resultString += ("Number of incoming links: " + getNumberIncomingLinks());
+	/**
+	 * 
+	 * @return a row of anchors, beginning with start and followed by the links.
+	 */
+	public String toStringLinkPath() {
+		String resultString = "";
+		if (getAnchor() == null) {
+			resultString += getURL();
+		} else {
+			resultString += getAnchor() + ": ";
+			for (PageNode pN : outgoingLinks) {
+				resultString += pN.getAnchor() + " ";
+			}
+		}
 		return resultString;
 	}
 
 	/**
-	 * Returns a link path string of the anchors of page node and links. Begins
-	 * by the anchor of the page node and will be continued by the anchors of
-	 * the links
+	 * 
+	 * @return a row of anchors, beginning with start and followed by the links.
+	 */
+	public String toStringLinkPathWithoutSuffix() {
+		String resultString = "";
+		if (getAnchor() == null) {
+			resultString += getURL();
+		} else {
+			resultString += getAnchorWithoutSuffix() + ": ";
+			for (PageNode pN : outgoingLinks) {
+				resultString += pN.getAnchorWithoutSuffix() + " ";
+			}
+		}
+		return resultString;
+	}
+
+	/**
 	 * 
 	 * @return
 	 */
-	public String toStringLinkPath() {
-		String resultString = getAnchor() + ": ";
-		for (PageNode pN : outgoingLinks) {
-			resultString += pN.getAnchor() + " ";
+	public String toStringHtmlParseInformation() {
+		String string = "";
+		if (headPage.getParseData() instanceof HtmlParseData) {
+			HtmlParseData htmlParseData = (HtmlParseData) headPage
+					.getParseData();
+			String text = htmlParseData.getText();
+			String html = htmlParseData.getHtml();
+			string += "Text length: " + text.length() + "\n";
+			string += "Html length: " + html.length() + "\n";
 		}
-		return resultString + "\n";
+		return string;
 	}
 
 	/**
@@ -310,7 +354,7 @@ public class PageNode {
 		HtmlParseData htmlParseData = (HtmlParseData) headPage.getParseData();
 		return htmlParseData.getOutgoingUrls();
 	}
-	
+
 	public String getOutgoingLinkUrlFromHeadPage(int index) {
 		return this.getWebUrlsFromHeadPage().get(index).getURL();
 	}
@@ -318,7 +362,8 @@ public class PageNode {
 	/**
 	 * Initialize an empty page node by a given page.
 	 * 
-	 * @param page the new page head for the page node.
+	 * @param page
+	 *            the new page head for the page node.
 	 */
 	protected void initNewPageNode(Page page) {
 		this.headPage = page;

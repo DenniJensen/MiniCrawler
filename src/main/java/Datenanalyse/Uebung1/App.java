@@ -1,5 +1,7 @@
 package Datenanalyse.Uebung1;
 
+import java.io.File;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -27,8 +29,6 @@ public class App {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		//TODO graph
-		//TODO page rank
 		logger.setLevel(Level.DEBUG);
 		System.out.println("\nSearch Engine by Dennis Haegler\n");
 		String crawlStorageFolder = "crawl";

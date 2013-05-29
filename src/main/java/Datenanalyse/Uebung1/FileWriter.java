@@ -24,35 +24,17 @@ public class FileWriter {
 	private boolean isOpen;
 
 	/**
-	 * Constructs an empty FileWriter.
-	 */
-	public FileWriter() {
-		this.bufferedWriter = null;
-		this.isOpen = false;
-	}
-
-	/**
 	 * Constructs a FileWriter for the file in the given path. The Constructor
 	 * will initializes the BufferedWriter with the file from the given path.
 	 * 
-	 * @param path the path where the file lies.
+	 * @param filename the name of the file.
 	 */
-	public FileWriter(String path) {
-		initBufferedWriter(path);
+	public FileWriter(String filename) {
+		initBufferedWriter(filename);
 	}
 
 	/**
-	 * Opens a file on the given path.
-	 * 
-	 * @param path
-	 *            is the path of the file where the file lies.
-	 */
-	public void openFile(String path) {
-		initBufferedWriter(path);
-	}
-
-	/**
-	 * Writes the given test in the file, if the file is opened.
+	 * Writes the given text in the file, if the file is opened.
 	 * 
 	 * @param text
 	 *            the test to wish to write in the file.
@@ -87,7 +69,7 @@ public class FileWriter {
 	}
 
 	/**
-	 * Initializes a the <code></code>
+	 * Initializes a the <code>BufferedWriter</code>
 	 * 
 	 * @param path
 	 */

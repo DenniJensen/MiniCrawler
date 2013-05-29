@@ -49,7 +49,7 @@ public class MyCrawler extends WebCrawler {
 	 */
 	@Override
 	public void visit(Page page) {
-		writePageInformation(page);
+		System.out.println(toStringPageInformation(page));
 		crawledPages.add(page);
 	}
 
@@ -63,8 +63,19 @@ public class MyCrawler extends WebCrawler {
 		}
 		pageGraph.linkPageNodes();
 		System.out.println("Page graph size: " + pageGraph.size());
-		System.out.println(toString());
-		System.out.println(toStringLinkPath());
+		String pageInfo = toString();
+		String path = toStringLinkPath();
+		String pathWithoutSuffix = toStringLinkPathWithoutSuffix();
+		System.out.println(pageInfo);
+		System.out.println(pathWithoutSuffix);
+		
+		FileWriter crawledPages = new FileWriter("cawled_page_informations.txt");
+		crawledPages.write(pageInfo);
+		FileWriter linkPath = new FileWriter("path_listing.txt");
+		linkPath.write(path);
+		linkPath.write(pathWithoutSuffix);
+		crawledPages.closeFile();
+		linkPath.closeFile();
 	}
 
 	/**
@@ -86,13 +97,25 @@ public class MyCrawler extends WebCrawler {
 	public String toStringLinkPath() {
 		return pageGraph.toStringLinkPath();
 	}
+	
+	/**
+	 * Returns the string of a link path of the page nodes in the page graph. A
+	 * link path is row of anchor. The first anchor is the anchor which contains
+	 * the following anchors as links. <b>The anchor will be without a suffix like 
+	 * html</b>.
+	 * @return
+	 */
+	public String toStringLinkPathWithoutSuffix() {
+		return pageGraph.toStringLinkPathWithoutSuffix();
+	}
 
 	/**
 	 * Writes all information of a visited page on the terminal.
 	 * 
 	 * @param page a page crawled by crawler4j.
 	 */
-	public void writePageInformation(Page page) {
+	public String toStringPageInformation(Page page) {
+		String string = "";
 		int docid = page.getWebURL().getDocid();
 		String url = page.getWebURL().getURL();
 		String domain = page.getWebURL().getDomain();
@@ -100,20 +123,27 @@ public class MyCrawler extends WebCrawler {
 		String subDomain = page.getWebURL().getSubDomain();
 		String parentUrl = page.getWebURL().getParentUrl();
 		String anchor = page.getWebURL().getAnchor();
-
-		System.out.println("Docid: " + docid);
-		System.out.println("URL: " + url);
-		System.out.println("Domain: '" + domain + "'");
-		System.out.println("Sub-domain: '" + subDomain + "'");
-		System.out.println("Path: '" + path + "'");
-		System.out.println("Parent page: " + parentUrl);
-		System.out.println("Anchor text: " + anchor);
+		
+		string += "Docid: " + docid + "\n";
+		string += "URL: " + url + "\n";
+		string += "Domain: '" + domain + "'\n";
+		string += "Sub-domain: '" + subDomain + "'\n";
+		string += "Path: '" + path + "'\n";
+		string += "Parent page: " + parentUrl + "\n";
+		string += "Anchor text: " + anchor + "\n";
 
 		if (page.getParseData() instanceof HtmlParseData) {
 			ParseData parseData = (ParseData) getHtmlLinkOnly(page);
 			page.setParseData(parseData);
-			writeHTMLParseDataInformation(page);
+			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+			String text = htmlParseData.getText();
+			String html = htmlParseData.getHtml();
+			List<WebURL> links = htmlParseData.getOutgoingUrls();
+			string += "Text length: " + text.length() + "\n";
+			string += "Html length: " + html.length() + "\n";
+			string += "Number of outgoing links: " + links.size() + "\n\n";
 		}
+		return string;
 	}
 
 	public List<WebURL> getHtmlLinkOnly(List<WebURL> links) {
@@ -126,17 +156,6 @@ public class MyCrawler extends WebCrawler {
 			}
 		}
 		return result;
-	}
-
-	private void writeHTMLParseDataInformation(Page page) {
-		List<WebURL> links = new ArrayList<WebURL>();
-		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-		String text = htmlParseData.getText();
-		String html = htmlParseData.getHtml();
-		links = htmlParseData.getOutgoingUrls();
-		System.out.println("Text length: " + text.length());
-		System.out.println("Html length: " + html.length());
-		System.out.println("Number of outgoing links: " + links.size() + "\n");
 	}
 
 	private HtmlParseData getHtmlLinkOnly(Page page) {

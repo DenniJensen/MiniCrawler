@@ -210,7 +210,7 @@ public class PageGraph {
 	 * link path is row of anchor. The first anchor is the anchor which contains
 	 * the following anchors.
 	 * 
-	 * @return
+	 * @return the string of a link path, beginning with head page.
 	 */
 	public String toStringLinkPath() {
 		String result = "";
@@ -219,8 +219,23 @@ public class PageGraph {
 		}
 		return result;
 	}
+	
+	/**
+	 * Returns the string of a link path of the page nodes in the page graph. A
+	 * link path is row of anchor. The first anchor is the anchor which contains
+	 * the following anchors as links. <b>The anchor will be without a suffix like 
+	 * html</b>.
+	 * 
+	 * @return the string of a link path, beginning with head page.
+	 */
+	public String toStringLinkPathWithoutSuffix() {
+		String result = "";
+		for (PageNode pageNode : pageNodes) {
+			result += pageNode.toStringLinkPathWithoutSuffix() + "\n";
+		}
+		return result;
+	}
 
-	//TODO
 	/**
 	 * Linking all page nodes with each other if they are linked.
 	 */
@@ -228,10 +243,8 @@ public class PageGraph {
 		String url = "";
 		int numberLinks;
 		PageNode linkedNode;
-		
 		for (PageNode pageNode : pageNodes) {
 			numberLinks = pageNode.getNumberOutgoingLinksFromHeadPage();
-			
 			for (int i = 0; i < numberLinks; i++) {
 				url = pageNode.getOutgoingLinkUrlFromHeadPage(i);
 				if (this.existAsPageNode(url)) {
