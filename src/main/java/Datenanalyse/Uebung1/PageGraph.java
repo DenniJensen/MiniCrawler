@@ -220,22 +220,24 @@ public class PageGraph {
 		return result;
 	}
 
+	//TODO
 	/**
 	 * Linking all page nodes with each other if they are linked.
 	 */
 	public void linkPageNodes() {
 		String url = "";
 		int numberLinks;
-		PageNode bufferNode;
+		PageNode linkedNode;
+		
 		for (PageNode pageNode : pageNodes) {
 			numberLinks = pageNode.getNumberOutgoingLinksFromHeadPage();
+			
 			for (int i = 0; i < numberLinks; i++) {
-				url = pageNode.getOutgoingLink(i).getURL();
+				url = pageNode.getOutgoingLinkUrlFromHeadPage(i);
 				if (this.existAsPageNode(url)) {
-					bufferNode = getPageNode(url);
-					log.debug("Found page node: " + bufferNode.getURL());
-					bufferNode.addIncomingLink(pageNode);
-					pageNode.addOutgoingLink(bufferNode);
+					linkedNode = this.getPageNode(url);
+					pageNode.addOutgoingLink(linkedNode);
+					linkedNode.addIncomingLink(pageNode);
 				} 
 			}
 		}

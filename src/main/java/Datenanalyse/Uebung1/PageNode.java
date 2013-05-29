@@ -32,7 +32,7 @@ public class PageNode {
 	 */
 	public PageNode(Page page) {
 		initNewPageNode(page);
-		initOutgoingLinks(); // TODO right Init of links
+		//initOutgoingLinks();
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class PageNode {
 	 * Returns the number of incoming links
 	 */
 	public int getNumberIncomingLinks() {
-		return outgoingLinks.size();
+		return incomingLinks.size();
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class PageNode {
 	 * @return
 	 */
 	public int getNumberOutgoingLinksFromHeadPage() {
-		return getWebUrlsFromHeadPage(headPage).size();
+		return getWebUrlsFromHeadPage().size();
 	}
 
 	/**
@@ -260,7 +260,7 @@ public class PageNode {
 		String anchor = getAnchor();
 
 		resultString += ("Docid: " + docid + "\n");
-		resultString += ("URL: " + url + "\n");
+		resultString += ("URL: " + url + "\nf");
 		resultString += ("Domain: '" + domain + "'\n");
 		resultString += ("Sub-domain: '" + subDomain + "'\n");
 		resultString += ("Path: '" + path + "'\n");
@@ -280,18 +280,18 @@ public class PageNode {
 	 * @return
 	 */
 	public String toStringLinkPath() {
-		String resultString = getAnchor();
+		String resultString = getAnchor() + ": ";
 		for (PageNode pN : outgoingLinks) {
 			resultString += pN.getAnchor() + " ";
 		}
-		return resultString;
+		return resultString + "\n";
 	}
 
 	/**
 	 * 
 	 */
 	private void initOutgoingLinks() {
-		List<WebURL> links = getWebUrlsFromHeadPage(headPage);
+		List<WebURL> links = this.getWebUrlsFromHeadPage();
 		links = pickHTML(links);
 		List<PageNode> pageNodes = new ArrayList<PageNode>();
 		for (WebURL link : links) {
@@ -306,9 +306,13 @@ public class PageNode {
 	 * @param page
 	 * @return
 	 */
-	private List<WebURL> getWebUrlsFromHeadPage(Page page) {
-		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+	private List<WebURL> getWebUrlsFromHeadPage() {
+		HtmlParseData htmlParseData = (HtmlParseData) headPage.getParseData();
 		return htmlParseData.getOutgoingUrls();
+	}
+	
+	public String getOutgoingLinkUrlFromHeadPage(int index) {
+		return this.getWebUrlsFromHeadPage().get(index).getURL();
 	}
 
 	/**

@@ -64,8 +64,7 @@ public class MyCrawler extends WebCrawler {
 		pageGraph.linkPageNodes();
 		System.out.println("Page graph size: " + pageGraph.size());
 		System.out.println(toString());
-		System.out.println(toString());
-
+		System.out.println(toStringLinkPath());
 	}
 
 	/**
@@ -88,6 +87,11 @@ public class MyCrawler extends WebCrawler {
 		return pageGraph.toStringLinkPath();
 	}
 
+	/**
+	 * Writes all information of a visited page on the terminal.
+	 * 
+	 * @param page a page crawled by crawler4j.
+	 */
 	public void writePageInformation(Page page) {
 		int docid = page.getWebURL().getDocid();
 		String url = page.getWebURL().getURL();
