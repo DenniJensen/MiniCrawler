@@ -1,0 +1,4 @@
+log4j.rootLogger=ERROR, App
+log4j.appender.App=org.apache.log4j.ConsoleAppender
+log4j.appender.App.layout=org.apache.log4j.PatternLayout
+log4j.appender.App.layout.ConversionPattern=%-4r [%t] %-5p %c %x \u2013 %m%n
