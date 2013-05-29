@@ -33,12 +33,16 @@ public class MyCrawler extends WebCrawler {
 	/**
 	 * Specifies whether the given url should be crawled or not (based on your
 	 * crawling logic).
+	 * Change the logic by change the <code>shouldVisit</code>.
+	 * The crawler on visit pages if this methode returns true.
+	 * 
+	 * @return true if the page should be visited otherwise false.
 	 */
 	@Override
 	public boolean shouldVisit(WebURL url) {
+		String shouldVisit = "http://mysql12.f4.htw-berlin.de/crawl/";
 		String href = url.getURL().toLowerCase();
-		return href.startsWith("http://mysql12.f4.htw-berlin.de/crawl/d")
-				&& href.endsWith(".html");
+		return href.startsWith(shouldVisit) && href.endsWith(".html");
 	}
 
 	/**
@@ -50,7 +54,8 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 		System.out.println(toStringPageInformation(page));
-		crawledPages.add(page);
+		writeCrawledPage(page.getWebURL().getAnchor(), page);
+		//crawledPages.add(page);
 	}
 
 	/**
@@ -61,6 +66,7 @@ public class MyCrawler extends WebCrawler {
 		for (Page page : crawledPages) {
 			pageGraph.addNoneExcistingPageNode(page);
 		}
+		
 		pageGraph.linkPageNodes();
 		System.out.println("Page graph size: " + pageGraph.size());
 		String pageInfo = toString();
@@ -68,13 +74,12 @@ public class MyCrawler extends WebCrawler {
 		String pathWithoutSuffix = toStringLinkPathWithoutSuffix();
 		System.out.println(pageInfo);
 		System.out.println(pathWithoutSuffix);
-		
+
 		FileWriter crawledPages = new FileWriter("cawled_page_informations.txt");
 		crawledPages.write(pageInfo);
 		FileWriter linkPath = new FileWriter("path_listing.txt");
 		linkPath.write(path);
 		linkPath.write(pathWithoutSuffix);
-		crawledPages.closeFile();
 		linkPath.closeFile();
 	}
 
@@ -97,12 +102,13 @@ public class MyCrawler extends WebCrawler {
 	public String toStringLinkPath() {
 		return pageGraph.toStringLinkPath();
 	}
-	
+
 	/**
 	 * Returns the string of a link path of the page nodes in the page graph. A
 	 * link path is row of anchor. The first anchor is the anchor which contains
-	 * the following anchors as links. <b>The anchor will be without a suffix like 
-	 * html</b>.
+	 * the following anchors as links. <b>The anchor will be without a suffix
+	 * like html</b>.
+	 * 
 	 * @return
 	 */
 	public String toStringLinkPathWithoutSuffix() {
@@ -112,7 +118,8 @@ public class MyCrawler extends WebCrawler {
 	/**
 	 * Writes all information of a visited page on the terminal.
 	 * 
-	 * @param page a page crawled by crawler4j.
+	 * @param page
+	 *            a page crawled by crawler4j.
 	 */
 	public String toStringPageInformation(Page page) {
 		String string = "";
@@ -123,7 +130,7 @@ public class MyCrawler extends WebCrawler {
 		String subDomain = page.getWebURL().getSubDomain();
 		String parentUrl = page.getWebURL().getParentUrl();
 		String anchor = page.getWebURL().getAnchor();
-		
+
 		string += "Docid: " + docid + "\n";
 		string += "URL: " + url + "\n";
 		string += "Domain: '" + domain + "'\n";
@@ -158,6 +165,43 @@ public class MyCrawler extends WebCrawler {
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param filename
+	 * @param pageNode
+	 */
+	private void writeCrawledPage(String filename, PageNode pageNode) {
+		FileWriter crawledPages = new FileWriter("crawled/stored/" + filename);
+		if (filename.endsWith(".html")) {
+			crawledPages.write(pageNode.getHtml());
+		} else {
+			crawledPages.write(pageNode.getText());
+		}
+		crawledPages.closeFile();
+	}
+
+	/**
+	 * 
+	 * @param filename
+	 * @param page
+	 */
+	private void writeCrawledPage(String filename, Page page) {
+		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+		FileWriter crawledPages = new FileWriter("crawled/crawler4j/"
+				+ filename);
+		if (filename.endsWith(".txt")) {
+			crawledPages.write(htmlParseData.getText());
+		} else {
+			crawledPages.write(htmlParseData.getHtml());
+		}
+		crawledPages.closeFile();
+	}
+
+	/**
+	 * 
+	 * @param page
+	 * @return
+	 */
 	private HtmlParseData getHtmlLinkOnly(Page page) {
 		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 		List<WebURL> links = getHtmlLinkOnly(htmlParseData.getOutgoingUrls());

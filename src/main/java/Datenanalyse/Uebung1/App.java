@@ -33,7 +33,8 @@ public class App {
 		System.out.println("\nSearch Engine by Dennis Haegler\n");
 		String crawlStorageFolder = "crawl";
 		int numberOfCrawlers = 1;
-		String crawlUrl = "http://mysql12.f4.htw-berlin.de/crawl/";
+		//String crawlUrl = "http://mysql12.f4.htw-berlin.de/crawl/";
+		String crawlUrl = "http://www.openframeworks.cc/";
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);

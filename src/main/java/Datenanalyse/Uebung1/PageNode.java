@@ -135,6 +135,24 @@ public class PageNode {
 	public String getAnchorWithoutSuffix() {
 		return getAnchor().split(".html")[0];
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getText() {
+		HtmlParseData htmlParseData = (HtmlParseData) headPage.getParseData();
+		return htmlParseData.getText();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getHtml() {
+		HtmlParseData htmlParseData = (HtmlParseData) headPage.getParseData();
+		return htmlParseData.getHtml();
+	}
 
 	/**
 	 * 
