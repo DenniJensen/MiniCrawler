@@ -1,6 +1,5 @@
 package Datenanalyse.Uebung1;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +9,6 @@ import org.apache.log4j.Logger;
 import Datenanalyse.Uebung1.Index.LuceneWriter;
 import Datenanalyse.Uebung1.PageGraph.PageGraph;
 import Datenanalyse.Uebung1.PageGraph.PageNode;
-import Datenanalyse.Uebung1.PageRank.PageRank;
-
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
@@ -91,13 +88,18 @@ public class MyCrawler extends WebCrawler {
 			logger.info("LINK PATH DETECTED:\n" + linkPathWithoutSuffix);
 			
 			System.out.print("PageGraph size: " + pageGraph.size() + "\n");
-			
 			pageGraph.calculatePageRanks();
 			System.out.println(pageGraph.toStringPageRank());
 			
 	
 			storePageGraphLucen();
+			
 		
+			try {
+				this.lucenewriter.close();
+			}
+			catch (IOException e) {
+			}
 			
 			//PageRank pageRank = new PageRank(pageGraph);
 			//pageRank.calculatePageRanks();
