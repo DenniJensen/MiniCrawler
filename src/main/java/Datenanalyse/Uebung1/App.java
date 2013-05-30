@@ -5,6 +5,8 @@ import java.io.File;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import Datenanalyse.Uebung1.Index.LuceneWriter;
+
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -33,8 +35,7 @@ public class App {
 		System.out.println("\nSearch Engine by Dennis Haegler\n");
 		String crawlStorageFolder = "crawl";
 		int numberOfCrawlers = 1;
-		//String crawlUrl = "http://mysql12.f4.htw-berlin.de/crawl/";
-		String crawlUrl = "http://www.openframeworks.cc/";
+		String crawlUrl = "http://mysql12.f4.htw-berlin.de/crawl/";
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
@@ -49,5 +50,9 @@ public class App {
 		crawlController.addSeed(crawlUrl);
 		crawlController.start(MyCrawler.class, numberOfCrawlers);
 		System.out.println("Finished Crawl "+ crawlUrl);
+		
+		//LuceneWriter storedPageWriter = new LuceneWriter("index/");
+		//LuceneWriter out = new LuceneWriter("crawled/stored");
+		
 	}
 }

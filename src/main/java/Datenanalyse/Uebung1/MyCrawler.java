@@ -1,7 +1,17 @@
 package Datenanalyse.Uebung1;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import Datenanalyse.Uebung1.Index.LuceneWriter;
+import Datenanalyse.Uebung1.PageGraph.PageGraph;
+import Datenanalyse.Uebung1.PageGraph.PageNode;
+import Datenanalyse.Uebung1.PageRank.PageRank;
+
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
@@ -16,33 +26,40 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class MyCrawler extends WebCrawler {
 
+	/** Logger to log informations */
+	static Logger logger = Logger.getLogger(MyCrawler.class);
+
 	/** Crawler stores pages in the page graph */
 	private PageGraph pageGraph;
 
-	/** List of crawled pages. Stored from the web crawler. */
-	private ArrayList<Page> crawledPages;
+	private LuceneWriter lucenewriter;
 
 	/**
 	 * Initialize the list of the crawled pages and the page graph.
 	 */
 	public void onStart() {
 		this.pageGraph = new PageGraph();
-		crawledPages = new ArrayList<Page>();
+		try {
+			this.lucenewriter = new LuceneWriter("index");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
 	 * Specifies whether the given url should be crawled or not (based on your
-	 * crawling logic).
-	 * Change the logic by change the <code>shouldVisit</code>.
+	 * crawling logic). Change the logic by change the <code>shouldVisit</code>.
 	 * The crawler on visit pages if this methode returns true.
 	 * 
 	 * @return true if the page should be visited otherwise false.
 	 */
 	@Override
 	public boolean shouldVisit(WebURL url) {
-		String shouldVisit = "http://mysql12.f4.htw-berlin.de/crawl/";
+		String expectationUrl = "http://mysql12.f4.htw-berlin.de/crawl/";
 		String href = url.getURL().toLowerCase();
-		return href.startsWith(shouldVisit) && href.endsWith(".html");
+		return href.startsWith(expectationUrl) && href.endsWith(".html");
 	}
 
 	/**
@@ -53,34 +70,38 @@ public class MyCrawler extends WebCrawler {
 	 */
 	@Override
 	public void visit(Page page) {
-		System.out.println(toStringPageInformation(page));
-		writeCrawledPage(page.getWebURL().getAnchor(), page);
-		//crawledPages.add(page);
+		logger.info(toStringPageInformation(page));
+		storeCrawledPageAsFile(page.getWebURL().getAnchor(), page);
+		pageGraph.addNoneExcistingPageNode(page);
 	}
 
 	/**
 	 * Runs before the crawler terminates. Handle stored list of pages.
 	 */
 	public void onBeforeExit() {
-		System.out.println("crawled Pages: " + crawledPages.size());
-		for (Page page : crawledPages) {
-			pageGraph.addNoneExcistingPageNode(page);
-		}
+		storePageGraphElementsAsFiles();
+		if (!this.pageGraph.isEmpty()) {
+			this.pageGraph.linkPageNodes();
+			String storedPages = toString();
+			String linkPathWithoutSuffix = toStringLinkPathWithoutSuffix();
+			storeFile("cawled_page_informations.txt", storedPages);
+			storeFile("path_listing.txt", linkPathWithoutSuffix);
+			
+			logger.info("CRAWLED\n" + storedPages);
+			logger.info("LINK PATH DETECTED:\n" + linkPathWithoutSuffix);
+			
+			System.out.print("PageGraph size: " + pageGraph.size() + "\n");
+			
+			pageGraph.calculatePageRanks();
+			System.out.println(pageGraph.toStringPageRank());
+			
+	
+			storePageGraphLucen();
 		
-		pageGraph.linkPageNodes();
-		System.out.println("Page graph size: " + pageGraph.size());
-		String pageInfo = toString();
-		String path = toStringLinkPath();
-		String pathWithoutSuffix = toStringLinkPathWithoutSuffix();
-		System.out.println(pageInfo);
-		System.out.println(pathWithoutSuffix);
-
-		FileWriter crawledPages = new FileWriter("cawled_page_informations.txt");
-		crawledPages.write(pageInfo);
-		FileWriter linkPath = new FileWriter("path_listing.txt");
-		linkPath.write(path);
-		linkPath.write(pathWithoutSuffix);
-		linkPath.closeFile();
+			
+			//PageRank pageRank = new PageRank(pageGraph);
+			//pageRank.calculatePageRanks();
+		}
 	}
 
 	/**
@@ -153,7 +174,80 @@ public class MyCrawler extends WebCrawler {
 		return string;
 	}
 
-	public List<WebURL> getHtmlLinkOnly(List<WebURL> links) {
+	/**
+	 * Stores a crawled page as a file. The content of the file belongs on the
+	 * suffix of the filename. If the suffix is ".txt", the content will be an
+	 * clean text. Otherwise the content will be HTML data.
+	 * 
+	 * @param filename
+	 *            path of the file.
+	 * @param pageNode
+	 *            delivers the content of the file.
+	 */
+	private void storeStoredPageAsFile(String filename, PageNode pageNode) {
+		if (filename.endsWith(".txt")) {
+			storeFile("crawled/stored/" + filename, pageNode.getText());
+		} else {
+			storeFile("crawled/stored/" + filename, pageNode.getHtml());
+		}
+	}
+
+	/**
+	 * Stores a crawled page as a file. The content of the file belongs on the
+	 * suffix of the filename. If the suffix is ".txt", the content will be an
+	 * clean text. Otherwise the content will be HTML data.
+	 * 
+	 * @param filename
+	 *            path of the file.
+	 * @param page
+	 *            delivers the content for the file.
+	 */
+	private void storeCrawledPageAsFile(String filename, Page page) {
+		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+		if (filename.endsWith(".txt")) {
+			storeFile("crawled/crawler4j/" + filename, htmlParseData.getText());
+		} else {
+			storeFile("crawled/crawler4j/" + filename, htmlParseData.getHtml());
+		}
+	}
+
+	/**
+	 * Stores a file with a content.
+	 * 
+	 * @param filename
+	 *            path of the file.
+	 * @param content
+	 *            text in the file.
+	 */
+	private void storeFile(String filename, String content) {
+		FileWriter fw = new FileWriter(filename);
+		fw.write(content);
+		fw.closeFile();
+	}
+
+	/**
+	 * Returns links with html suffix only from the links of a
+	 * <code>ParsData</code> of a <code>Page</code>
+	 * 
+	 * @param page
+	 *            a crawler4j Page.
+	 * @return links with html suffix only.
+	 */
+	private HtmlParseData getHtmlLinkOnly(Page page) {
+		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+		List<WebURL> links = getHtmlLinkOnly(htmlParseData.getOutgoingUrls());
+		htmlParseData.setOutgoingUrls(links);
+		return htmlParseData;
+	}
+
+	/**
+	 * Returns the html links from the given list of WebURL links.
+	 * 
+	 * @param links
+	 *            list of links.
+	 * @return html suffix only links.
+	 */
+	private List<WebURL> getHtmlLinkOnly(List<WebURL> links) {
 		List<WebURL> result = new ArrayList<WebURL>();
 		boolean isHTMLEnding = false;
 		for (WebURL url : links) {
@@ -166,46 +260,33 @@ public class MyCrawler extends WebCrawler {
 	}
 
 	/**
-	 * 
-	 * @param filename
-	 * @param pageNode
+	 * Stores files of all stored <code>PageNodes</code> in the
+	 * <code>PageGrap</code>.
 	 */
-	private void writeCrawledPage(String filename, PageNode pageNode) {
-		FileWriter crawledPages = new FileWriter("crawled/stored/" + filename);
-		if (filename.endsWith(".html")) {
-			crawledPages.write(pageNode.getHtml());
-		} else {
-			crawledPages.write(pageNode.getText());
+	private void storePageGraphElementsAsFiles() {
+		int graphSize = this.pageGraph.size();
+		PageNode pageNode;
+		String filename;
+		for (int i = 0; i < graphSize; i++) {
+			pageNode = this.pageGraph.getPageNode(i);
+			filename = pageNode.getAnchor();
+			storeStoredPageAsFile(filename, pageNode);
 		}
-		crawledPages.closeFile();
 	}
-
-	/**
-	 * 
-	 * @param filename
-	 * @param page
-	 */
-	private void writeCrawledPage(String filename, Page page) {
-		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-		FileWriter crawledPages = new FileWriter("crawled/crawler4j/"
-				+ filename);
-		if (filename.endsWith(".txt")) {
-			crawledPages.write(htmlParseData.getText());
-		} else {
-			crawledPages.write(htmlParseData.getHtml());
+	
+	private void storePageGraphLucen() {
+		int size = pageGraph.size();
+		String pageName;
+		String content;
+		for (int i = 0; i < size; i++) {
+			pageName = pageGraph.getPageNode(i).getAnchor();
+			content = pageGraph.getPageNode(i).getText();
+			try {
+				this.lucenewriter.write(pageName, content);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				logger.error(e);
+			}
 		}
-		crawledPages.closeFile();
-	}
-
-	/**
-	 * 
-	 * @param page
-	 * @return
-	 */
-	private HtmlParseData getHtmlLinkOnly(Page page) {
-		HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-		List<WebURL> links = getHtmlLinkOnly(htmlParseData.getOutgoingUrls());
-		htmlParseData.setOutgoingUrls(links);
-		return htmlParseData;
 	}
 }
