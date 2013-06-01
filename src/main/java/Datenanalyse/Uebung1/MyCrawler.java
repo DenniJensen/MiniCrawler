@@ -35,6 +35,7 @@ public class MyCrawler extends WebCrawler {
 	/**
 	 * Initialize the list of the crawled pages and the page graph.
 	 */
+	@Override
 	public void onStart() {
 		this.pageGraph = new PageGraph();
 		try {
@@ -76,6 +77,7 @@ public class MyCrawler extends WebCrawler {
 	/**
 	 * Runs before the crawler terminates. Handle stored list of pages.
 	 */
+	@Override
 	public void onBeforeExit() {
 		storePageGraphElementsAsFiles();
 		if (!this.pageGraph.isEmpty()) {
@@ -90,7 +92,7 @@ public class MyCrawler extends WebCrawler {
 			
 			System.out.print("PageGraph size: " + pageGraph.size() + "\n");
 			pageGraph.calculatePageRanks();
-			System.out.println(pageGraph.toStringPageRank());
+			System.out.println(pageGraph.toStringPageRankOfPageNodes());
 			
 	
 			storePageGraphLucen();
@@ -112,6 +114,7 @@ public class MyCrawler extends WebCrawler {
 	 * 
 	 * @return a string of the page graph.
 	 */
+	@Override
 	public String toString() {
 		return pageGraph.toString();
 	}
@@ -164,7 +167,7 @@ public class MyCrawler extends WebCrawler {
 		string += "Anchor text: " + anchor + "\n";
 
 		if (page.getParseData() instanceof HtmlParseData) {
-			ParseData parseData = (ParseData) getHtmlLinkOnly(page);
+			ParseData parseData = getHtmlLinkOnly(page);
 			page.setParseData(parseData);
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 			String text = htmlParseData.getText();

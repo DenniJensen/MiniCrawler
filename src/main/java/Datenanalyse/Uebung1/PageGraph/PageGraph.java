@@ -13,6 +13,7 @@ import edu.uci.ics.crawler4j.crawler.Page;
  */
 public class PageGraph {
 
+	/** Logger from log4j to log. */
 	static Logger log = Logger.getLogger(PageGraph.class);
 
 	/** Array list of page nodes */
@@ -227,6 +228,7 @@ public class PageGraph {
 	 * 
 	 * @return string with information of the page nodes in the page graph.
 	 */
+	@Override
 	public String toString() {
 		String result = "";
 		for (PageNode pageNode : pageNodes) {
@@ -265,6 +267,19 @@ public class PageGraph {
 		}
 		return result;
 	}
+	
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String toStringPageRankOfPageNodes() {
+		String string = "";
+		for (PageNode pageNode : pageNodes) {
+			string += pageNode.getAnchorWithoutSuffix() + ": " + pageNode.getPageRankNew() + "\n";
+		}
+		return string;
+	}
 
 	/**
 	 * Linking all page nodes with each other if they are linked.
@@ -285,30 +300,35 @@ public class PageGraph {
 			}
 		}
 	}
-
-	// PAGERANK
-	// ##########################################################
-
-	public String toStringPageRank() {
-		String string = "";
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public double getPageRankSumOfAllPageNodes() {
+		double sumPagerank = 0;
 		for (PageNode pageNode : pageNodes) {
-			string += pageNode.getAnchorWithoutSuffix() + ": " + pageNode.getPageRankNew() + "\n";
+			sumPagerank += pageNode.getPageRankNew();
 		}
-		return string;
+		return sumPagerank;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public double calculatePageRanks() {
 		double restult = 0;
 		this.setInitialPagerank();
-		//int interator = 1;
 		while (!this.hasTerminatingAccuracy()) {
-			// this.printPageRankSum();
 			this.iteratePagerank();
-			//interator++;
 		}
 		return restult;
 	}
 
+	/**
+	 * 
+	 */
 	private void setInitialPagerank() {
 		double initialPagerank = 1.0 / this.size();
 		for (PageNode pageNode : pageNodes) {
@@ -316,6 +336,9 @@ public class PageGraph {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void iteratePagerank() {
 		double x; 
 		double y; 
@@ -329,6 +352,10 @@ public class PageGraph {
 		}
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	private boolean hasTerminatingAccuracy() {
 		boolean terminated = false;
 		double absSumChangesWithLastIteration = 0;
@@ -342,7 +369,12 @@ public class PageGraph {
 		return terminated;
 	}
 
-	public double getPagesPagerankValue(PageNode pageNode) {
+	/**
+	 * 
+	 * @param pageNode
+	 * @return
+	 */
+	private double getPagesPagerankValue(PageNode pageNode) {
 		double linkedPagerankValue = pageNode.getLinkedPageRankValue();
 		double nonLinkedPagesPagerankValue = this
 				.getNonLinkedPagesPagerankValue();
@@ -350,14 +382,10 @@ public class PageGraph {
 				* (linkedPagerankValue + nonLinkedPagesPagerankValue);
 	}
 
-	private double getPageRankSum() {
-		double sumPagerank = 0;
-		for (PageNode pageNode : pageNodes) {
-			sumPagerank += pageNode.getPageRankNew();
-		}
-		return sumPagerank;
-	}
-
+	/**
+	 * 
+	 * @return
+	 */
 	private double getNonLinkedPagesPagerankValue() {
 		double nonLinkedPagerankValue = 0;
 		for (PageNode pageNode : pageNodes) {
@@ -368,6 +396,10 @@ public class PageGraph {
 		return nonLinkedPagerankValue;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	private double getTeleportPagerankValue() {
 		return (this.teleportationProbability / this.size());
 	}

@@ -436,6 +436,19 @@ public class PageNode {
 	public String getOutgoingLinkUrlFromHeadPage(int index) {
 		return this.getWebUrlsFromHeadPage().get(index).getURL();
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public double getLinkedPageRankValue() {
+		double linkedPagerankValue = 0;
+		for (PageNode linkedNode : incomingLinks) {
+				linkedPagerankValue += linkedNode.pageRankOld
+						/ linkedNode.getNumberOutgoingLinks();
+		}
+		return linkedPagerankValue;
+	}
 
 	/**
 	 * Initialize an empty page node by a given page.
@@ -447,19 +460,7 @@ public class PageNode {
 		this.headPage = page;
 		this.outgoingLinks = new ArrayList<PageNode>();
 		this.incomingLinks = new ArrayList<PageNode>();
+		this.pageRankNew = 0;
+		this.pageRankOld = 0;
 	}
-
-	// TODO calculate page Rank
-	//###########################################################
-	
-
-	public double getLinkedPageRankValue() {
-		double linkedPagerankValue = 0;
-		for (PageNode linkedNode : incomingLinks) {
-				linkedPagerankValue += linkedNode.pageRankOld
-						/ (double) linkedNode.getNumberOutgoingLinks();
-		}
-		return linkedPagerankValue;
-	}
-	
 }
