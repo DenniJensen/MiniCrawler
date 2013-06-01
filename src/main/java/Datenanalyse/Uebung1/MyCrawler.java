@@ -29,6 +29,7 @@ public class MyCrawler extends WebCrawler {
 	/** Crawler stores pages in the page graph */
 	private PageGraph pageGraph;
 
+	/** A lucene writer */
 	private LuceneWriter lucenewriter;
 
 	/**
@@ -40,7 +41,7 @@ public class MyCrawler extends WebCrawler {
 			this.lucenewriter = new LuceneWriter("index");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 		}
 
 	}
