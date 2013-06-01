@@ -1,3 +1,5 @@
 .classpath
 .profile
 *.txt
+crawled/stored/*
+crawled/crawler4j/*
