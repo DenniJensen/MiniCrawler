@@ -29,6 +29,13 @@ public class App {
 	static Logger logger = Logger.getLogger(App.class);
 
 	/**
+	 * Constructs a App (application).
+	 */
+	public App() {
+		
+	}
+	
+	/**
 	 * @param args
 	 * @throws Exception
 	 */
@@ -38,6 +45,7 @@ public class App {
 		String crawlStorageFolder = "crawl";
 		int numberOfCrawlers = 1;
 		String crawlUrl = "http://mysql12.f4.htw-berlin.de/crawl/";
+		
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
@@ -56,9 +64,14 @@ public class App {
 
 		// LuceneWriter storedPageWriter = new LuceneWriter("index/");
 		// LuceneWriter out = new LuceneWriter("crawled/stored");
-		if (searchIndex("tokens") && searchIndex("index") && searchIndex("classification")) {
+		if (searchIndex("tokens") && searchIndex("index")
+				&& searchIndex("classification")) {
 			System.out.println("worked");
 		}
+	}
+
+	public void run() {
+		
 	}
 
 	private static boolean searchIndex(String value) {

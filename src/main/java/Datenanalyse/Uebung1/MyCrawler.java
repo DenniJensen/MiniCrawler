@@ -56,9 +56,10 @@ public class MyCrawler extends WebCrawler {
 	 */
 	@Override
 	public boolean shouldVisit(WebURL url) {
-		String expectationUrl = "http://mysql12.f4.htw-berlin.de/crawl/";
+		String crawlUrl = "http://mysql12.f4.htw-berlin.de/crawl/";
+		
 		String href = url.getURL().toLowerCase();
-		return href.startsWith(expectationUrl) && href.endsWith(".html");
+		return href.startsWith(crawlUrl) && href.endsWith(".html");
 	}
 
 	/**
@@ -69,9 +70,10 @@ public class MyCrawler extends WebCrawler {
 	 */
 	@Override
 	public void visit(Page page) {
-		logger.info(toStringPageInformation(page));
+		System.out.println(toStringPageInformation(page));
+		//logger.info(toStringPageInformation(page));
 		storeCrawledPageAsFile(page.getWebURL().getAnchor(), page);
-		pageGraph.addNoneExcistingPageNode(page);
+		//pageGraph.addNoneExcistingPageNode(page);
 	}
 
 	/**
@@ -93,11 +95,8 @@ public class MyCrawler extends WebCrawler {
 			System.out.print("PageGraph size: " + pageGraph.size() + "\n");
 			pageGraph.calculatePageRanks();
 			System.out.println(pageGraph.toStringPageRankOfPageNodes());
-			
-	
+
 			storePageGraphLucen();
-			
-		
 			try {
 				this.lucenewriter.close();
 			}
