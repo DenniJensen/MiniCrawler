@@ -44,11 +44,21 @@ public class PageGraph {
 	public void setPageNode(ArrayList<PageNode> pageNodes) {
 		this.pageNodes = pageNodes;
 	}
-	
+
+	/**
+	 * Returns the damping factor.
+	 * 
+	 * @return the damping factor.
+	 */
 	public double getDampingFactor() {
 		return dampingFactor;
 	}
 
+	/**
+	 * Sets the damping factor.
+	 * 
+	 * @param dampingFactor
+	 */
 	public void setDampingFactor(double dampingFactor) {
 		this.dampingFactor = dampingFactor;
 	}
@@ -124,9 +134,11 @@ public class PageGraph {
 	}
 
 	/**
+	 * Returns the page node with the same url from the given page node.
 	 * 
 	 * @param pageNode
-	 * @return
+	 *            the page node you look for with the same url.
+	 * @return the page node matching with the given page node.
 	 */
 	public PageNode getPageNode(PageNode pageNode) {
 		String webUrl = pageNode.getURL();
@@ -134,9 +146,11 @@ public class PageGraph {
 	}
 
 	/**
+	 * Returns the page node with containing url from the given page.
 	 * 
 	 * @param page
-	 * @return
+	 *            contains the url you look for the page node.
+	 * @return the page node with the url from the given page.
 	 */
 	public PageNode getPageNode(Page page) {
 		String webUrl = page.getWebURL().getURL();
@@ -144,9 +158,11 @@ public class PageGraph {
 	}
 
 	/**
+	 * Returns the page node by the given url.
 	 * 
 	 * @param url
-	 * @return
+	 *            the url you look for the page node.
+	 * @return the page node by the given url.
 	 */
 	public PageNode getPageNode(String url) {
 		for (PageNode pageNode : pageNodes) {
@@ -158,8 +174,9 @@ public class PageGraph {
 	}
 
 	/**
+	 * Returns the size of the page graph.
 	 * 
-	 * @return
+	 * @return the size of the page graph.
 	 */
 	public int size() {
 		return pageNodes.size();
@@ -267,16 +284,17 @@ public class PageGraph {
 		}
 		return result;
 	}
-	
 
 	/**
+	 * Returns a string of all page ranks of all page nodes in the page graph.
 	 * 
-	 * @return
+	 * @return a string of all page ranks.
 	 */
 	public String toStringPageRankOfPageNodes() {
 		String string = "";
 		for (PageNode pageNode : pageNodes) {
-			string += pageNode.getAnchorWithoutSuffix() + ": " + pageNode.getPageRankNew() + "\n";
+			string += pageNode.getAnchorWithoutSuffix() + ": "
+					+ pageNode.getPageRankNew() + "\n";
 		}
 		return string;
 	}
@@ -300,10 +318,11 @@ public class PageGraph {
 			}
 		}
 	}
-	
+
 	/**
+	 * Returns the summary of all page nodes.
 	 * 
-	 * @return
+	 * @return the summary of all page nodes.
 	 */
 	public double getPageRankSumOfAllPageNodes() {
 		double sumPagerank = 0;
@@ -312,10 +331,11 @@ public class PageGraph {
 		}
 		return sumPagerank;
 	}
-	
+
 	/**
+	 * Calculates the page rank in the page graph.
 	 * 
-	 * @return
+	 * @return the calculated page rank.
 	 */
 	public double calculatePageRanks() {
 		double restult = 0;
@@ -327,7 +347,8 @@ public class PageGraph {
 	}
 
 	/**
-	 * 
+	 * Sets a Initial page rank. A initial page rank is <b>1.0 / (count of all
+	 * page node in the page graph</b>
 	 */
 	private void setInitialPagerank() {
 		double initialPagerank = 1.0 / this.size();
@@ -337,22 +358,24 @@ public class PageGraph {
 	}
 
 	/**
-	 * 
+	 * Iterate to the next step for the page rank calculation.
 	 */
 	private void iteratePagerank() {
-		double x; 
-		double y; 
+		double x;
+		double y;
 		for (PageNode pageNode : pageNodes) {
 			pageNode.setPageRankOld(pageNode.getPageRankNew());
 		}
 		for (PageNode pageNode : pageNodes) {
 			x = this.getTeleportPagerankValue();
-			y = this.getPagesPagerankValue(pageNode);	
+			y = this.getPagesPagerankValue(pageNode);
 			pageNode.setPageRankNew(x + y);
 		}
 	}
 
 	/**
+	 * Returns if the terminating value has been arrived. The terminating value
+	 * is the limit when the algorithm has to stop.
 	 * 
 	 * @return
 	 */
