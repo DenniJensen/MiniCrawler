@@ -4,3 +4,4 @@
 *.txt
 crawled/stored/*
 crawled/crawler4j/*
+/target
